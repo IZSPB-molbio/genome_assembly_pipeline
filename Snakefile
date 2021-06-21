@@ -149,10 +149,19 @@ rule trimmomatic:
     log:
         "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
     conda: "envs/wgs.yml"
-    run:
-        #trimmomatic_adapters_path = get_trimmomatic_adapters_path()
-        shell("export tap=$(which trimmomatic | sed 's/bin\/trimmomatic/share\/trimmomatic\/adapters\/TruSeq3-PE.fa/g'); trimmomatic PE {params.options} -threads {threads} {input.R1} {input.R2} {params.out1P} {params.out1U} {params.out2P} {params.out2U} ILLUMINACLIP:$tap:2:30:10 {params.processing_options} &> {log}")
-        shell("zcat {params.out1U} {params.out2U} | gzip > {output.out1U} && rm {params.out1U} {params.out2U}")
+    shell:
+        """
+        export tap=$(which trimmomatic | sed 's/bin\/trimmomatic/share\/trimmomatic\/adapters\/TruSeq3-PE.fa/g')
+        
+        trimmomatic PE {params.options} \
+        -threads {threads} {input.R1} {input.R2} \
+        {params.out1P} {params.out1U} {params.out2P} {params.out2U} \
+        ILLUMINACLIP:$tap:2:30:10 {params.processing_options} &> {log}
+        """
+    # run:
+    #     #trimmomatic_adapters_path = get_trimmomatic_adapters_path()
+    #     shell("export tap=$(which trimmomatic | sed 's/bin\/trimmomatic/share\/trimmomatic\/adapters\/TruSeq3-PE.fa/g'); trimmomatic PE {params.options} -threads {threads} {input.R1} {input.R2} {params.out1P} {params.out1U} {params.out2P} {params.out2U} ILLUMINACLIP:$tap:2:30:10 {params.processing_options} &> {log}")
+    #     shell("zcat {params.out1U} {params.out2U} | gzip > {output.out1U} && rm {params.out1U} {params.out2U}")
 
 rule fastqc_filtered:
     input:

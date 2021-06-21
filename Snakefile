@@ -46,7 +46,8 @@ rule all:
     input:
         # assembly
         # "assembly/{date}/spades/{sample}_5/pipeline_state/stage_9_terminate"
-        expand("assembly/spades/{sample}_5/pipeline_state/stage_9_terminate", sample=sample_list),
+        expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
+        expand("qc/quast/{sample}/report.pdf", sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads/raw",
                      outfolder="data/reads/raw"),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
@@ -246,7 +247,7 @@ rule assembly:
         # R2 = "data/reads/filtered/{sample}.notCombined_2.fastq.gz",
         # U = "data/reads/filtered/{sample}.extendedFrags.fastq.gz"
     output:
-        final_file = os.path.join(assembly_spades_outpath, "{sample}_5/pipeline_state/stage_9_terminate")
+        final_file = os.path.join(assembly_spades_outpath, "{sample}/pipeline_state/stage_9_terminate")
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
     conda: "envs/wgs.yml"
@@ -259,7 +260,7 @@ rule assembly_qc:
         assembly = rules.assembly.output.final.file,
         R1       = rules.merge_PE.output.R1,
         R2       = rules.merge_PE.output.R2,
-        U       = rules.merge_PE.output.U,
+        U        = rules.merge_PE.output.U,
     output:
         # report.pdf
         pdf = "qc/quast/{sample}/report.pdf"

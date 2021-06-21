@@ -268,5 +268,7 @@ rule assembly_qc:
         outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")
     conda:
         "envs/quast.yml"
+    threads:
+        10
     script:
         "scripts/quast.py"

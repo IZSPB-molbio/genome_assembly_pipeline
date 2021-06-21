@@ -11,6 +11,7 @@ input_R1 = snakemake.input.R1
 input_R2 = snakemake.input.R2
 input_U  = snakemake.input.U
 outdir   = snakemake.params.outdir
+threads  = snakemake.threads
 
 pe1 = ""
 pe2 = ""
@@ -31,6 +32,6 @@ shell("""
     {pe1} \
     {pe2} \
     {me} \
-    -t 20 --glimmer \
+    -t {threads} --glimmer \
     {assembly}
     """)

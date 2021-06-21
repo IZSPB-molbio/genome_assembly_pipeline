@@ -248,31 +248,35 @@ rule assembly:
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
     conda: "envs/wgs.yml"
-    run:
-        if len(input.R1) > 1:
-            pe1 = ""
-            for x, i in enumerate(input.R1):
-                pe1 += "--pe{n}-1 {inputfile} ".format(n=x+1, inputfile=i)
-            pe2 = ""
-            for x, i in enumerate(input.R2):
-                pe2 += "--pe{n}-2 {inputfile} ".format(n=x+1, inputfile=i)
-            me  = ""
-            for x, i in enumerate(input.U):
-                me += "--pe{n}-m {inputfile} ".format(n=x+1, inputfile=i)
-            shell("""
-                spades.py \
-                --isolate \
-                -t 20 \
-                -o {params.outdir} \
-                {pe1} {pe2} {me}
-                """)
-        else:
-            shell("""
-                spades.py \
-                --isolate \
-                -t 20 \
-                -o {params.outdir} \
-                -1 {input.R1} \
-                -2 {input.R2} \
-                --merged {input.U}
-                """)
+    script:
+        """
+        scripts/spades.py
+        """
+    # run:
+    #     if len(input.R1) > 1:
+    #         pe1 = ""
+    #         for x, i in enumerate(input.R1):
+    #             pe1 += "--pe{n}-1 {inputfile} ".format(n=x+1, inputfile=i)
+    #         pe2 = ""
+    #         for x, i in enumerate(input.R2):
+    #             pe2 += "--pe{n}-2 {inputfile} ".format(n=x+1, inputfile=i)
+    #         me  = ""
+    #         for x, i in enumerate(input.U):
+    #             me += "--pe{n}-m {inputfile} ".format(n=x+1, inputfile=i)
+    #         shell("""
+    #             spades.py \
+    #             --isolate \
+    #             -t 20 \
+    #             -o {params.outdir} \
+    #             {pe1} {pe2} {me}
+    #             """)
+    #     else:
+    #         shell("""
+    #             spades.py \
+    #             --isolate \
+    #             -t 20 \
+    #             -o {params.outdir} \
+    #             -1 {input.R1} \
+    #             -2 {input.R2} \
+    #             --merged {input.U}
+    #             """)

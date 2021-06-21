@@ -114,7 +114,7 @@ rule fastqc_raw:
     #     "QC of raw read files {input} with {version}, {wildcards}"
     log:
         "qc/data/reads/raw/{sample}_{library}.log"
-    #conda: "envs/environment.yaml"
+    conda: "envs/wgs.yml"
     shell:
         """
         mkdir -p {params.outDir}
@@ -148,7 +148,7 @@ rule trimmomatic:
     #     "Filtering read dataset {wildcards.sample}_{wildcards.library} with Trimmomatic. {wildcards}" # v{version}"
     log:
         "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
-    #conda: "envs/environment.yaml"
+    conda: "envs/wgs.yml"
     run:
         #trimmomatic_adapters_path = get_trimmomatic_adapters_path()
         shell("export tap=$(which trimmomatic | sed 's/bin\/trimmomatic/share\/trimmomatic\/adapters\/TruSeq3-PE.fa/g'); trimmomatic PE {params.options} -threads {threads} {input.R1} {input.R2} {params.out1P} {params.out1U} {params.out2P} {params.out2U} ILLUMINACLIP:$tap:2:30:10 {params.processing_options} &> {log}")
@@ -180,7 +180,7 @@ rule fastqc_filtered:
     log:
         "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
         # "qc/data/reads/filtered/{sample}_{library}.log"
-    #conda: "envs/environment.yaml"
+    conda: "envs/wgs.yml"
     shell:
         """
 
@@ -206,6 +206,7 @@ rule merge_PE:
         outdir = lambda wildcards, output: os.path.split(output.R1)[0]
     log:
         "logs/data/reads/filtered/flash/{sample}_{library}.log"
+    conda: "envs/wgs.yml"
     shell:
         """
         flash \
@@ -237,6 +238,7 @@ rule assembly:
         final_file = os.path.join(assembly_spades_outpath, "{sample}_5/pipeline_state/stage_9_terminate")
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
+    conda: "envs/wgs.yml"
     run:
         if len(input.R1) > 1:
             pe1 = ""

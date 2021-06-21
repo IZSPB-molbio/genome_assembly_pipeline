@@ -1,0 +1,44 @@
+results:    "results"
+map_dir:    "map"
+log_dir:    "logs"
+tmp_dir:    "/tmp"
+species: 
+use_custom_n_genome: False
+reads_raw: "data/reads/raw"
+
+qc:
+    fastqc:
+        raw: "qc/data/reads/raw"
+        filtered: "qc/data/reads/filtered"
+
+read_processing:
+    trimmomatic:
+        outdir: "data/reads/filtered"
+        options: "-phred33"
+        processing_options: "LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+        java_cmd: "java"
+        #jar_file: "/crex/proj/uppstore2018171/conda_envs/mtoolbox-ark/share/trimmomatic/trimmomatic.jar"
+        java_vm_mem: "4G"
+        threads: 5
+
+assembly:
+    spades:
+        outdir: "assembly/spades"
+
+map:
+    gmap_db_dir:        "gmap_db"
+    gmap_threads:       4
+    gmap_remap_threads: 4
+
+mark_duplicates: False
+
+trimBam: False
+
+mtvcf_main_analysis:
+    # minumum distance from read end to keep in a mutation
+    tail:  5
+    # minimum QS for mutation
+    Q:    25
+    # minimum coverage depth for a mutation to be kept
+    minrd: 5
+    tail_mismatch: 5

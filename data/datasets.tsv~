@@ -1,0 +1,3 @@
+sample	R1	R2	kit
+LM119	LM119_S7_L001_R1_001.fastq.gz	LM119_S7_L001_R2_001.fastq.gz
+LM2520	LM2520_S1_L001_R1_001.fastq.gz	LM2520_S1_L001_R2_001.fastq.gz

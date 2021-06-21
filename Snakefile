@@ -157,6 +157,8 @@ rule trimmomatic:
         -threads {threads} {input.R1} {input.R2} \
         {params.out1P} {params.out1U} {params.out2P} {params.out2U} \
         ILLUMINACLIP:$tap:2:30:10 {params.processing_options} &> {log}
+        
+        zcat {params.out1U} {params.out2U} | gzip > {output.out1U} && rm {params.out1U} {params.out2U}
         """
     # run:
     #     #trimmomatic_adapters_path = get_trimmomatic_adapters_path()

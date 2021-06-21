@@ -258,7 +258,8 @@ rule assembly_qc:
     input:
         # assembly, reads
         # assembly = lambda wildcards, rules: os.path.join(rules.assembly.params.outdir, "scaffolds.fasta"),
-        assembly = lambda wildcards: rules.assembly.output.final_file.replace("{sample}/pipeline_state/stage_9_terminate".format(sample=wildcards.sample), "{sample}/scaffolds.fasta".format(sample=wildcards.sample)),
+        # assembly = lambda wildcards: rules.assembly.output.final_file.replace("{sample}/pipeline_state/stage_9_terminate".format(sample=wildcards.sample), "{sample}/scaffolds.fasta".format(sample=wildcards.sample)),
+        assembly = rules.assembly.output.final_file,
         R1       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
         R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),

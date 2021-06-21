@@ -6,7 +6,7 @@ from snakemake import shell
 # input_U  = sys.argv[3]
 # outdir   = sys.argv[4]
 
-assembly = snakemake.input.assembly
+assembly = snakemake.input.assembly.replace("pipeline_state/stage_9_terminate", "scaffolds.fasta")
 input_R1 = snakemake.input.R1
 input_R2 = snakemake.input.R2
 input_U  = snakemake.input.U

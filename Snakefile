@@ -251,9 +251,7 @@ rule assembly:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
     conda: "envs/wgs.yml"
     script:
-        """
-        scripts/spades.py
-        """
+        "scripts/spades.py"
     # run:
     #     if len(input.R1) > 1:
     #         pe1 = ""

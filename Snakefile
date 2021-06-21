@@ -252,3 +252,28 @@ rule assembly:
     conda: "envs/wgs.yml"
     script:
         "scripts/spades.py"
+
+rule assembly_qc:
+    input:
+        # assembly, reads
+        assembly = rules.assembly.output.final.file,
+        R1       = rules.merge_PE.output.R1,
+        R2       = rules.merge_PE.output.R2,
+        U       = rules.merge_PE.output.U,
+    output:
+        # report.pdf
+        pdf = "qc/quast/{sample}/report.pdf"
+    params:
+        outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")
+    conda:
+        "envs/quast.yml"
+    shell:
+        """
+        quast \
+        -o {params.outdir} \
+        -1 {input.R1} \
+        -2 {input.R2} \
+        --single {input.U} \
+        -t 20 --glimmer \
+        {input.assembly}
+        """

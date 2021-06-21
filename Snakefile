@@ -258,9 +258,9 @@ rule assembly_qc:
     input:
         # assembly, reads
         assembly = rules.assembly.output.final_file,
-        R1       = rules.merge_PE.output.R1,
-        R2       = rules.merge_PE.output.R2,
-        U        = rules.merge_PE.output.U,
+        R1       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
+        R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
+        U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),
     output:
         # report.pdf
         pdf = "qc/quast/{sample}/report.pdf"
@@ -268,13 +268,5 @@ rule assembly_qc:
         outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")
     conda:
         "envs/quast.yml"
-    shell:
-        """
-        quast \
-        -o {params.outdir} \
-        -1 {input.R1} \
-        -2 {input.R2} \
-        --single {input.U} \
-        -t 20 --glimmer \
-        {input.assembly}
-        """
+    script:
+        "scripts/quast.py"

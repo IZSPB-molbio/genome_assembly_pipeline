@@ -259,7 +259,7 @@ rule assembly:
             me  = ""
             for x, i in enumerate(input.U):
                 me += "--pe{n}-m {inputfile} ".format(n=x+1, inputfile=i)
-            run("""
+            shell("""
                 spades.py \
                 --isolate \
                 -t 20 \
@@ -267,7 +267,7 @@ rule assembly:
                 {pe1} {pe2} {me}
                 """)
         else:
-            run("""
+            shell("""
                 spades.py \
                 --isolate \
                 -t 20 \

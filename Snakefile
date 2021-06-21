@@ -257,7 +257,7 @@ rule assembly:
 rule assembly_qc:
     input:
         # assembly, reads
-        assembly = rules.assembly.output.final.file,
+        assembly = rules.assembly.output.final_file,
         R1       = rules.merge_PE.output.R1,
         R2       = rules.merge_PE.output.R2,
         U        = rules.merge_PE.output.U,

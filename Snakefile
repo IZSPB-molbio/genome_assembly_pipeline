@@ -225,7 +225,7 @@ rule merge_PE:
         -z \
         -t 5 \
         -d {params.outdir} \
-        -o {wildcards.sample} \
+        -o {wildcards.sample}_{wildcards.library} \
         {input.R1} \
         {input.R2}
         """

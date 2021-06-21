@@ -13,6 +13,16 @@ from Bio.Seq import reverse_complement
 
 # from modules.constants import CLEV, COV, DIUPAC, GLEN, MQUAL
 
+def get_files_assembly(datasets_tab=None, sample=None, mate=None, infolder="data/reads/filtered"):
+    ext = {"R1" : ".notCombined_1.fastq.gz", "R2" : ".notCombined_2.fastq.gz", "U" : ".extendedFrags.fastq.gz"}
+    read_file_list = []
+    for i, l in datasets_tab.iterrows():
+        if l["sample"] == sample:
+            read_file_list.append(os.path.join(infolder, "{sample}_{library}{suffix}".format(sample=l["sample"], \
+                                                                                             library=l["library"], \
+                                                                                             suffix=ext[mate])))
+    return read_file_list
+
 def is_compr_file(f):
     with gzip.open(f, 'r') as fh:
         try:

@@ -21,12 +21,13 @@ from modules.config_parsers import (
 )
 
 from modules.general import (
-    check_tmp_dir, gapped_fasta2contigs, get_seq_name, sam_to_fastq, sam_cov_handle2gapped_fasta,
-    trimmomatic_input
+    check_tmp_dir, gapped_fasta2contigs, get_files_assembly, get_seq_name, sam_to_fastq,
+    sam_cov_handle2gapped_fasta, trimmomatic_input
 )
 
 # fields: sample  ref_genome_mt   ref_genome_n
 analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", datasets_tab_file="data/datasets.tab")
+sample_list = list(analysis_tab["sample"])
 # analysis_tab, reference_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", reference_tab_file="data/reference_genomes.tab", datasets_tab_file="data/datasets.tab")
 
 ### Parse values from config.yaml
@@ -45,6 +46,7 @@ rule all:
     input:
         # assembly
         # "assembly/{date}/spades/{sample}_5/pipeline_state/stage_9_terminate"
+        expand("assembly/spades/{sample}_5/pipeline_state/stage_9_terminate", sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads/raw",
                      outfolder="data/reads/raw"),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
@@ -213,8 +215,10 @@ rule merge_PE:
         -d {params.outdir} \
         -o {wildcards.sample} \
         {input.R1} \
-        {input.R2}# &> ${logs}/${sample}.log
+        {input.R2}
         """
+
+# &> ${logs}/${sample}.log
 
 rule assembly:
     # for the input, need to get two lists: R1 and R2.
@@ -222,9 +226,10 @@ rule assembly:
     # otherwise need to use --pe<#>-1, --pe<#>-2, --pe<#>-m
     # at the moment, SE reads are left behind. 
     input:
-        R1 = rules.merge_PE.output.R1,
-        R2 = rules.merge_PE.output.R2,
-        U = rules.merge_PE.output.U,
+        # get_files_assembly(datasets_tab=None, sample=None, l=None, infolder="data/reads/filtered")
+        R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
+        R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
+        U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
         # R1 = "data/reads/filtered/{sample}.notCombined_1.fastq.gz",
         # R2 = "data/reads/filtered/{sample}.notCombined_2.fastq.gz",
         # U = "data/reads/filtered/{sample}.extendedFrags.fastq.gz"
@@ -233,13 +238,30 @@ rule assembly:
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
     run:
-        
-        """
-        spades.py \
-        --isolate \
-        -t 20 \
-        -o {params.outdir} \
-        -1 {input.R1} \
-        -2 {input.R1} \
-        --merged {input.U}
-        """
+        if len(input.R1) > 1:
+            pe1 = ""
+            for x, i in enumerate(input.R1):
+                pe1 += "--pe{n}-1 {inputfile} ".format(n=x+1, inputfile=i)
+            pe2 = ""
+            for x, i in enumerate(input.R2):
+                pe2 += "--pe{n}-2 {inputfile} ".format(n=x+1, inputfile=i)
+            me  = ""
+            for x, i in enumerate(input.U):
+                me += "--pe{n}-m {inputfile} ".format(n=x+1, inputfile=i)
+            run("""
+                spades.py \
+                --isolate \
+                -t 20 \
+                -o {params.outdir} \
+                {pe1} {pe2} {me}
+                """)
+        else:
+            run("""
+                spades.py \
+                --isolate \
+                -t 20 \
+                -o {params.outdir} \
+                -1 {input.R1} \
+                -2 {input.R2} \
+                --merged {input.U}
+                """)

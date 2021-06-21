@@ -257,7 +257,7 @@ rule assembly:
 rule assembly_qc:
     input:
         # assembly, reads
-        assembly = rules.assembly.output.final_file,
+        assembly = os.path.join(rules.assembly.params.outdir, "scaffolds.fasta"),
         R1       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
         R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),

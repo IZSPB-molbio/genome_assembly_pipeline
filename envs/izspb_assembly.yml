@@ -1,0 +1,10 @@
+name: izspb_assembly
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - pandas
+  - snakemake
+  - biopython

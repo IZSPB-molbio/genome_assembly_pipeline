@@ -6,6 +6,7 @@ from snakemake import shell
 # input_U  = sys.argv[3]
 # outdir   = sys.argv[4]
 
+sample   = snakemake.wildcards.sample
 assembly = snakemake.input.assembly.replace("pipeline_state/stage_9_terminate", "scaffolds.fasta")
 input_R1 = snakemake.input.R1
 input_R2 = snakemake.input.R2
@@ -29,6 +30,7 @@ for e in input_U:
 shell("""
     quast \
     -o {outdir} \
+    -l {sample} \
     {pe1} \
     {pe2} \
     {me} \

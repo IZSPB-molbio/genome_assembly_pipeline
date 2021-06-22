@@ -1,0 +1,19 @@
+name: wgs
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - spades=3.15
+  - trimmomatic
+  - flash
+  - idba
+  - fastqc
+  - multiqc
+  - samtools
+  - bowtie2
+  - ivar
+  - pandas
+  - pilon
+prefix: /lustrehome/dsimone/miniconda3/envs/wgs

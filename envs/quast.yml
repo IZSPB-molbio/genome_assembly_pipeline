@@ -1,0 +1,9 @@
+name: quast
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - quast
+  - bwa

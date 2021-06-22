@@ -267,7 +267,8 @@ rule annotation:
 
 rule multiqc_all:
     input:
-        expand("qc/quast/{sample}/report.pdf", sample=sample_list)
+        expand("qc/quast/{sample}/report.pdf", sample=sample_list),
+        expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
     output:
         report = "reports/multiqc_report.html"
     conda:

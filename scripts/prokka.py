@@ -12,7 +12,7 @@ outdir        = snakemake.params.outdir
 threads       = snakemake.threads
 
 assembly_handle     = open(assembly_file, 'r')
-new_assembly        = assembly.replace(".fasta", ".prokka.fasta")
+new_assembly        = assembly_file.replace(".fasta", ".prokka.fasta")
 new_assembly_handle = open(new_assembly, 'w')
 
 for l in assembly_handle:

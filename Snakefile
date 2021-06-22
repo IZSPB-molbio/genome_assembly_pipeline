@@ -103,7 +103,7 @@ rule fastqc_raw:
     # message:
     #     "QC of raw read files {input} with {version}, {wildcards}"
     log:
-        "qc/data/reads/raw/{sample}_{library}.log"
+        "logs/qc/data/reads/raw/{sample}_{library}.log"
     conda: "envs/wgs.yml"
     shell:
         """
@@ -173,7 +173,7 @@ rule fastqc_filtered:
     # message:
     #     "QC of filtered read files {input} with {version}"
     log:
-        "qc/data/reads/raw/{sample}_{library}.log"
+        "logs/qc/data/reads/filtered/{sample}_{library}.log"
     conda: "envs/wgs.yml"
     shell:
         """

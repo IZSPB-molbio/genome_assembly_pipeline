@@ -268,7 +268,7 @@ rule annotation:
 
 rule abricate:
     input:
-        cds = lambda wildcards, rules: rules.annotation.output.sqn.replace(".sqn", ".ffn")
+        sqn = rules.annotation.output.sqn
     output:
         done = "annotation/abricate/{sample}.done"
     conda:

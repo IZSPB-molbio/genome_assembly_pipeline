@@ -173,7 +173,7 @@ rule fastqc_filtered:
     # message:
     #     "QC of filtered read files {input} with {version}"
     log:
-        "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
+        "qc/data/reads/raw/{sample}_{library}.log"
     conda: "envs/wgs.yml"
     shell:
         """

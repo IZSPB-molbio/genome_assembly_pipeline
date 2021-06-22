@@ -223,6 +223,8 @@ rule assembly:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
     conda:
         "envs/wgs.yml"
+    threads:
+        10
     log:
         "logs/assembly/spades/{sample}.log"
     script:

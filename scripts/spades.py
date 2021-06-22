@@ -10,6 +10,7 @@ input_R1 = snakemake.input.R1
 input_R2 = snakemake.input.R2
 input_U  = snakemake.input.U
 outdir   = snakemake.params.outdir
+threads  = snakemake.threads
 
 if len(input_R1) > 1:
     pe1 = ""
@@ -24,7 +25,7 @@ if len(input_R1) > 1:
     shell("""
         spades.py \
         --isolate \
-        -t 20 \
+        -t {threads} \
         -o {outdir} \
         {pe1} {pe2} {me}
         """)
@@ -32,7 +33,7 @@ else:
     shell("""
         spades.py \
         --isolate \
-        -t 20 \
+        -t {threads} \
         -o {outdir} \
         -1 {input_R1} \
         -2 {input_R2} \

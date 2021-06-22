@@ -45,6 +45,7 @@ assembly_spades_outpath = config["assembly"]["spades"]["outdir"]
 rule all:
     input:
         "reports/multiqc_report.html",
+        expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
         expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
         expand("qc/quast/{sample}/report.pdf", sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads/raw",
@@ -247,6 +248,22 @@ rule assembly_qc:
         "logs/qc/quast/{sample}.log"
     script:
         "scripts/quast.py"
+
+rule annotation:
+    input:
+        assembly = rules.assembly.output.final_file,
+    output:
+        sqn = "annotation/prokka/{sample}/{sample}.sqn"
+    params:
+        outdir = lambda wildcards, output: os.path.split(output.sqn)[0]
+    conda:
+        "envs/prokka.yml"
+    threads:
+        10
+    log:
+        "logs/annotation/prokka/{sample}.log"
+    script:
+        "scripts/prokka.py"
 
 rule multiqc_all:
     input:

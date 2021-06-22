@@ -15,22 +15,23 @@ log           = snakemake.log[0]
 
 import sys
 
-with open(log, "w") as f:
-    sys.stderr = sys.stdout = f
-    shell("""
-        for i in $(abricate --list | awk 'NR>1{print $1}')
-        do
-            echo $i
-            abricate \
-            --db $i \
-            --threads {threads} \
-            --minid 30 \
-            --mincov 70 \
-            {genome_cds}  | awk -v genome_id={sample} 'BEGIN{FS="\t";OFS="\t"}$1=genome_id{print $0}' > annotation/abricate/{sample}_${i}.out
-        done && touch annotation/abricate/{sample}.done
-        """)
+# with open(log, "w") as f:
+#     sys.stderr = sys.stdout = f
+shell("""
+    mkdir -p annotation/abricate
+    for i in $(abricate --list | awk 'NR>1{print $1}')
+    do
+        echo $i
+        abricate \
+        --db $i \
+        --threads {threads} \
+        --minid 30 \
+        --mincov 70 \
+        {genome_cds}  | awk -v genome_id={sample} 'BEGIN{FS="\t";OFS="\t"}$1=genome_id{print $0}' > annotation/abricate/{sample}_${i}.out
+    done 2> {log} && touch annotation/abricate/{sample}.done
+    """)
 
-f.close()
+# f.close()
 
 # log <- file(snakemake@log[[1]], open="wt")
 # sink(log)

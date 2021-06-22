@@ -24,6 +24,7 @@ new_assembly_handle.close()
 
 shell("""
     prokka \
+    --force \
     --cpu {threads} \
     --outdir {outdir} \
     --prefix {sample} \

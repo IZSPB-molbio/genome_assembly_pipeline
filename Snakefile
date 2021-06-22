@@ -205,7 +205,7 @@ rule merge_PE:
         -d {params.outdir} \
         -o {wildcards.sample}_{wildcards.library} \
         {input.R1} \
-        {input.R2}
+        {input.R2} &> {log}
         """
 
 rule assembly:

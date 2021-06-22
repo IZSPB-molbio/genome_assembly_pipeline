@@ -19,7 +19,7 @@ import sys
 #     sys.stderr = sys.stdout = f
 
 shell("""
-    abricate.sh {sample} {genome_cds} {threads} {log}
+    bash scripts/abricate.sh {sample} {genome_cds} {threads} {log}
     """)
 
 # shell("""

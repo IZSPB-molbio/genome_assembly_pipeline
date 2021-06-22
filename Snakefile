@@ -45,6 +45,7 @@ assembly_spades_outpath = config["assembly"]["spades"]["outdir"]
 rule all:
     input:
         "reports/multiqc_report.html",
+        expand("annotation/abricate/{sample}.done", sample=sample_list),
         expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
         expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
         expand("qc/quast/{sample}/report.pdf", sample=sample_list),

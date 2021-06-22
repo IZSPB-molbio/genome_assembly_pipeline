@@ -45,6 +45,7 @@ assembly_spades_outpath = config["assembly"]["spades"]["outdir"]
 rule all:
     input:
         "reports/multiqc_report.html",
+        "reports/abricate.html",
         expand("annotation/abricate/{sample}.done", sample=sample_list),
         expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
         expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
@@ -280,6 +281,19 @@ rule abricate:
     script:
         "scripts/abricate.py"
 
+rule abricate_summary:
+    input:
+        expand("annotation/abricate/{sample}.done", sample=sample_list)
+    output:
+        "reports/abricate.html"
+    params:
+        abricate_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
+    log:
+        "logs/annotation/abricate/aggregate.log"
+    conda:
+        "envs/r-stuff.yml"
+    script:
+        "scripts/abricate_aggregate.R"
 
 rule multiqc_all:
     input:

@@ -44,8 +44,7 @@ assembly_spades_outpath = config["assembly"]["spades"]["outdir"]
 
 rule all:
     input:
-        # assembly
-        # "assembly/{date}/spades/{sample}_5/pipeline_state/stage_9_terminate"
+        "reports/multiqc_report.html",
         expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
         expand("qc/quast/{sample}/report.pdf", sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads/raw",
@@ -248,3 +247,17 @@ rule assembly_qc:
         "logs/qc/quast/{sample}.log"
     script:
         "scripts/quast.py"
+
+rule multiqc_all:
+    input:
+        expand("qc/quast/{sample}/report.pdf", sample=sample_list)
+    output:
+        report = "reports/multiqc_report.html"
+    conda:
+        "envs/wgs.yml"
+    log:
+        "logs/qc/multiqc.log"
+    shell:
+        """
+        multiqc -fo reports/ .
+        """

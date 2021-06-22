@@ -13,6 +13,7 @@ read.abricate <- function(x){
 
 # craft the table
 abricate.results.files <- list.files(path = "annotation/abricate", pattern = "*_*.out", full.names = TRUE)
+print(abricate.results.files)
 abricate.results <- data.frame(do.call("rbind", lapply(abricate.results.files, read.abricate))) %>% mutate(resistance=tolower(resistance))
 
 abricate.results %>%
@@ -36,4 +37,5 @@ abricate.results %>%
             # list(extend = "colvis", columns = 1:ncol(.)),
             c('copy', 'csv', 'excel'))
     ),
-    rownames = FALSE)
+    rownames = FALSE) %>%
+	htmlwidgets::saveWidget("reports/abricate.html", selfcontained=TRUE)

@@ -221,7 +221,10 @@ rule assembly:
         final_file = os.path.join(assembly_spades_outpath, "{sample}/pipeline_state/stage_9_terminate")
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
-    conda: "envs/wgs.yml"
+    conda:
+        "envs/wgs.yml"
+    log:
+        "logs/assembly/spades/{sample}.log"
     script:
         "scripts/spades.py"
 
@@ -239,5 +242,7 @@ rule assembly_qc:
         "envs/quast.yml"
     threads:
         10
+    log:
+        "logs/qc/quast/{sample}.log"
     script:
         "scripts/quast.py"

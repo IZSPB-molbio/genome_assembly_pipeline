@@ -265,6 +265,21 @@ rule annotation:
     script:
         "scripts/prokka.py"
 
+rule abricate:
+    input:
+        cds = lambda wildcards, rules: rules.annotation.output.sqn.replace(".sqn", ".ffn")
+    output:
+        done = "annotation/abricate/{sample}.done"
+    conda:
+        "envs/abricate.yml"
+    threads:
+        4
+    log:
+        "logs/annotation/abricate/{sample}.log"
+    script:
+        "scripts/abricate.py"
+
+
 rule multiqc_all:
     input:
         expand("qc/quast/{sample}/report.pdf", sample=sample_list),

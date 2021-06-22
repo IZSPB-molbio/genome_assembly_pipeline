@@ -52,17 +52,6 @@ rule all:
                      outfolder="data/reads/raw"),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered", fastqc_folders = fastqc_folders),
-        
-
-# rule all:
-#     input:
-#         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads",
-#                      outfolder="data/reads"),
-#         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw"),
-#         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered"),
-#         # get_genome_vcf_files(analysis_tab),
-#         # get_bed_files(analysis_tab),
-#         # get_fasta_files(analysis_tab)
 
 rule symlink_libraries:
     input:
@@ -171,16 +160,10 @@ rule fastqc_filtered:
         out1P = rules.trimmomatic.output.out1P,
         out2P = rules.trimmomatic.output.out2P,
         out1U = rules.trimmomatic.output.out1U,
-        # out1P = "data/reads_filtered/{sample}_{library}_qc_R1.fastq.gz",
-        # out2P = "data/reads_filtered/{sample}_{library}_qc_R2.fastq.gz",
-        # out1U = "data/reads_filtered/{sample}_{library}_qc_U.fastq.gz",
     output:
         html_report_R1 = os.path.join(qc_fastqc_filtered, "{sample}_{library}.R1_fastqc.html"),
         html_report_R2 = os.path.join(qc_fastqc_filtered, "{sample}_{library}.R2_fastqc.html"),
         html_report_U  = os.path.join(qc_fastqc_filtered, "{sample}_{library}.U_fastqc.html"),
-        # html_report_R1 = "results/fastqc_filtered/{sample}_{library}_qc_R1_fastqc.html",
-        # html_report_R2 = "results/fastqc_filtered/{sample}_{library}_qc_R2_fastqc.html",
-        # html_report_U = "results/fastqc_filtered/{sample}_{library}_qc_U_fastqc.html",
     params:
         outDir = qc_fastqc_filtered
     threads:
@@ -191,7 +174,6 @@ rule fastqc_filtered:
     #     "QC of filtered read files {input} with {version}"
     log:
         "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
-        # "qc/data/reads/filtered/{sample}_{library}.log"
     conda: "envs/wgs.yml"
     shell:
         """
@@ -205,15 +187,10 @@ rule merge_PE:
     input:
         R1 = rules.trimmomatic.output.out1P,
         R2 = rules.trimmomatic.output.out2P,
-        # R1 = "data/reads/filtered/{sample}_R1.fastq.gz",
-        # R2 = "data/reads/filtered/{sample}_R2.fastq.gz"
     output:
         R1 = os.path.join(trimmomatic_outpath, "{sample}_{library}.notCombined_1.fastq.gz"),
         R2 = os.path.join(trimmomatic_outpath, "{sample}_{library}.notCombined_2.fastq.gz"),
         U = os.path.join(trimmomatic_outpath, "{sample}_{library}.extendedFrags.fastq.gz"),
-        # R1 = "data/reads/filtered/{sample}.notCombined_1.fastq.gz",
-        # R2 = "data/reads/filtered/{sample}.notCombined_2.fastq.gz",
-        # U = "data/reads/filtered/{sample}.extendedFrags.fastq.gz"
     params:
         outdir = lambda wildcards, output: os.path.split(output.R1)[0]
     log:
@@ -231,21 +208,15 @@ rule merge_PE:
         {input.R2}
         """
 
-# &> ${logs}/${sample}.log
-
 rule assembly:
     # for the input, need to get two lists: R1 and R2.
     # if len(R1) > 1, use standard command line with -1, -2, --merged
     # otherwise need to use --pe<#>-1, --pe<#>-2, --pe<#>-m
     # at the moment, SE reads are left behind. 
     input:
-        # get_files_assembly(datasets_tab=None, sample=None, l=None, infolder="data/reads/filtered")
         R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
         R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
-        # R1 = "data/reads/filtered/{sample}.notCombined_1.fastq.gz",
-        # R2 = "data/reads/filtered/{sample}.notCombined_2.fastq.gz",
-        # U = "data/reads/filtered/{sample}.extendedFrags.fastq.gz"
     output:
         final_file = os.path.join(assembly_spades_outpath, "{sample}/pipeline_state/stage_9_terminate")
     params:
@@ -256,15 +227,11 @@ rule assembly:
 
 rule assembly_qc:
     input:
-        # assembly, reads
-        # assembly = lambda wildcards, rules: os.path.join(rules.assembly.params.outdir, "scaffolds.fasta"),
-        # assembly = lambda wildcards: rules.assembly.output.final_file.replace("{sample}/pipeline_state/stage_9_terminate".format(sample=wildcards.sample), "{sample}/scaffolds.fasta".format(sample=wildcards.sample)),
         assembly = rules.assembly.output.final_file,
         R1       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
         R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),
     output:
-        # report.pdf
         pdf = "qc/quast/{sample}/report.pdf"
     params:
         outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")

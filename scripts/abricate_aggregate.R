@@ -13,7 +13,7 @@ read.abricate <- function(x){
 
 # craft the table
 abricate.results.files <- list.files(path = "annotation/abricate", pattern = "*_*.out", full.names = TRUE)
-print(abricate.results.files)
+#print(abricate.results.files)
 abricate.results <- data.frame(do.call("rbind", lapply(abricate.results.files, read.abricate))) %>% mutate(resistance=tolower(resistance))
 
 abricate.results %>%
@@ -28,11 +28,11 @@ abricate.results %>%
         autoWidth = TRUE,
         dom = "Blfrtip",
         colReorder = TRUE,
-        fixedHeader = TRUE,
+        fixedHeader = FALSE,
         pageLength = 50,
         lengthMenu = c(5, 10, 25, 50, 100, 200, 500, 1000),
-        scrollY = 450,
-        scrollCollapse = TRUE,
+        #scrollY = 450,
+        #scrollCollapse = TRUE,
         buttons = list(
             # list(extend = "colvis", columns = 1:ncol(.)),
             c('copy', 'csv', 'excel'))

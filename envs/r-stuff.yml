@@ -1,0 +1,9 @@
+name: r-stuff
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - r-tidyverse
+  - r-dt

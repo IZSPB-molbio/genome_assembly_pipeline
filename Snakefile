@@ -25,13 +25,12 @@ from modules.general import (
     sam_cov_handle2gapped_fasta, trimmomatic_input
 )
 
-analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", datasets_tab_file="data/datasets.tab")
-sample_list = list(analysis_tab["sample"])
-# analysis_tab, reference_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", reference_tab_file="data/reference_genomes.tab", datasets_tab_file="data/datasets.tab")
-
 ### Parse values from config.yaml
 configfile: "config.yaml"
 #
+analysis_tab_file = config["analysis_tab_file"]
+datasets_tab_file = config["datasets_tab_file"]
+
 results_dir = config["results_dir"]
 qc_fastqc_raw      = os.path.join(results_dir, config["qc"]["fastqc"]["raw"])
 qc_fastqc_filtered = os.path.join(results_dir, config["qc"]["fastqc"]["filtered"])
@@ -44,7 +43,7 @@ trimmomatic_outpath = os.path.join(results_dir, config["read_processing"]["trimm
 assembly_spades_outpath = os.path.join(results_dir, config["assembly"]["spades"]["outdir"])
 
 # parse run tabs
-analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", datasets_tab_file="data/datasets.tab")
+analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file=analysis_tab_file, datasets_tab_file=datasets_tab_file)
 sample_list = list(analysis_tab["sample"])
 
 rule all:

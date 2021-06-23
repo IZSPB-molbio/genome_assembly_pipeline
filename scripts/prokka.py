@@ -7,7 +7,7 @@ from snakemake import shell
 # outdir   = sys.argv[4]
 
 sample        = snakemake.wildcards.sample
-assembly_file = snakemake.input.assembly.replace("pipeline_state/stage_9_terminate", "scaffolds.fasta")
+assembly_file = snakemake.input.assembly#.replace("pipeline_state/stage_9_terminate", "scaffolds.fasta")
 outdir        = snakemake.params.outdir
 threads       = snakemake.threads
 

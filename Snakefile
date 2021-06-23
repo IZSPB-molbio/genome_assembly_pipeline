@@ -72,9 +72,9 @@ rule symlink_libraries:
         R2 = raw_outpath + "/{sample}_{library}.R2.fastq.gz",
     shell:
         """
-        cd data/reads/raw
-        ln -sf $(basename {input.R1}) $(basename {output.R1})
-        ln -sf $(basename {input.R2}) $(basename {output.R2})
+        cd {{raw_outpath}}
+        ln -sf {input.R1} $(basename {output.R1})
+        ln -sf {input.R2} $(basename {output.R2})
         """
 
 rule symlink_libraries_uncompressed:
@@ -88,9 +88,9 @@ rule symlink_libraries_uncompressed:
         R2 = raw_outpath + "/{sample}_{library}.R2.fastq",
     shell:
         """
-        cd data/reads/
-        ln -sf $(basename {input.R1}) $(basename {output.R1})
-        ln -sf $(basename {input.R2}) $(basename {output.R2})
+        cd {{raw_outpath}}
+        ln -sf {input.R1} $(basename {output.R1})
+        ln -sf {input.R2} $(basename {output.R2})
         """
 
 rule fastqc_raw:
@@ -111,7 +111,7 @@ rule fastqc_raw:
     # message:
     #     "QC of raw read files {input} with {version}, {wildcards}"
     log:
-        "logs/qc/data/reads/raw/{sample}_{library}.log"
+        os.path.join(results_dir, "logs/qc/data/reads/raw/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -147,7 +147,7 @@ rule trimmomatic:
     # message:
     #     "Filtering read dataset {wildcards.sample}_{wildcards.library} with Trimmomatic. {wildcards}" # v{version}"
     log:
-        "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log"
+        os.path.join(results_dir, "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -183,7 +183,7 @@ rule fastqc_filtered:
     # message:
     #     "QC of filtered read files {input} with {version}"
     log:
-        "logs/qc/data/reads/filtered/{sample}_{library}.log"
+        os.path.join(results_dir, "logs/qc/data/reads/filtered/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -204,7 +204,7 @@ rule merge_PE:
     params:
         outdir = lambda wildcards, output: os.path.split(output.R1)[0]
     log:
-        "logs/data/reads/filtered/flash/{sample}_{library}.log"
+        os.path.join(results_dir, "logs/data/reads/filtered/flash/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -236,7 +236,7 @@ rule assembly:
     threads:
         10
     log:
-        "logs/assembly/spades/{sample}.log"
+        os.path.join(results_dir, "logs/assembly/spades/{sample}.log")
     script:
         "scripts/spades.py"
 
@@ -255,7 +255,7 @@ rule assembly_qc:
     threads:
         10
     log:
-        "logs/qc/quast/{sample}.log"
+        os.path.join(results_dir, "logs/qc/quast/{sample}.log")
     script:
         "scripts/quast.py"
 
@@ -285,7 +285,7 @@ rule abricate:
     threads:
         4
     log:
-        "logs/annotation/abricate/{sample}.log"
+        os.path.join(results_dir, "logs/annotation/abricate/{sample}.log")
     script:
         "scripts/abricate.py"
 
@@ -312,7 +312,7 @@ rule multiqc_all:
     conda:
         "envs/wgs.yml"
     log:
-        "logs/qc/multiqc.log"
+        os.path.join(results_dir, "logs/qc/multiqc.log")
     shell:
         """
         multiqc -fo reports/ .

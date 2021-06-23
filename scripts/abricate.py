@@ -12,6 +12,7 @@ genome_cds    = snakemake.input.sqn.replace(".sqn", ".ffn")
 # outdir        = snakemake.params.outdir
 threads       = snakemake.threads
 log           = snakemake.log[0]
+output        = snakemake.output[0]
 
 import sys
 
@@ -19,7 +20,7 @@ import sys
 #     sys.stderr = sys.stdout = f
 
 shell("""
-    bash scripts/abricate.sh {sample} {genome_cds} {threads} {log}
+    bash scripts/abricate.sh {sample} {genome_cds} {threads} {log} {output}
     """)
 
 # shell("""

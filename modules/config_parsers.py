@@ -79,7 +79,7 @@ def get_datasets_for_symlinks(df, sample=None, library=None, d=None,
     for row in df.itertuples():
         if (getattr(row, "sample") == sample and
                 getattr(row, "library") == int(library)):
-            dataset_file = os.path.join(outfolder, getattr(row, d))
+            dataset_file = os.path.join(infolder, getattr(row, d))
 
     return dataset_file
 

@@ -33,39 +33,41 @@ sample_list = list(analysis_tab["sample"])
 ### Parse values from config.yaml
 configfile: "config.yaml"
 #
-qc_fastqc_raw      = config["qc"]["fastqc"]["raw"]
-qc_fastqc_filtered = config["qc"]["fastqc"]["filtered"]
+results_dir = config["results_dir"]
+qc_fastqc_raw      = os.path.join(results_dir, config["qc"]["fastqc"]["raw"])
+qc_fastqc_filtered = os.path.join(results_dir, config["qc"]["fastqc"]["filtered"])
 fastqc_folders = {"raw" : qc_fastqc_raw, "filtered" : qc_fastqc_filtered}
 #
-raw_outpath         = config["reads_raw"]
-trimmomatic_outpath = config["read_processing"]["trimmomatic"]["outdir"]
+reads_raw_source    = config["reads_raw_source"]
+raw_outpath         = os.path.join(results_dir, config["reads_raw"])
+trimmomatic_outpath = os.path.join(results_dir, config["read_processing"]["trimmomatic"]["outdir"])
 #
-assembly_spades_outpath = config["assembly"]["spades"]["outdir"]
+assembly_spades_outpath = os.path.join(results_dir, config["assembly"]["spades"]["outdir"])
 
 rule all:
     input:
-        "reports/multiqc_report.html",
-        "reports/abricate.html",
-        expand("annotation/abricate/{sample}.done", sample=sample_list),
-        expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
-        expand("assembly/spades/{sample}/pipeline_state/stage_9_terminate", sample=sample_list),
-        expand("qc/quast/{sample}/report.pdf", sample=sample_list),
-        get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder="data/reads/raw",
-                     outfolder="data/reads/raw"),
+        os.path.join(results_dir, "reports/multiqc_report.html"),
+        os.path.join(results_dir, "reports/abricate.html"),
+        expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list),
+        expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
+        expand(os.path.join(results_dir, "assembly/spades/{sample}/pipeline_state/stage_9_terminate"), sample=sample_list),
+        expand(os.path.join(results_dir, "qc/quast/{sample}/report.pdf"), sample=sample_list),
+        get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder=reads_raw_source,
+                     outfolder=raw_outpath),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered", fastqc_folders = fastqc_folders),
 
 rule symlink_libraries:
     input:
         R1 = lambda wildcards: get_datasets_for_symlinks(datasets_tab, sample=wildcards.sample,
-                                                         infolder=raw_outpath, outfolder=raw_outpath,
+                                                         infolder=reads_raw_source, outfolder=raw_outpath,
                                                          library=wildcards.library, d="R1"),
         R2 = lambda wildcards: get_datasets_for_symlinks(datasets_tab, sample=wildcards.sample,
-                                                         infolder=raw_outpath, outfolder=raw_outpath,
+                                                         infolder=reads_raw_source, outfolder=raw_outpath,
                                                          library=wildcards.library, d="R2")
     output:
-        R1 = "data/reads/raw/{sample}_{library}.R1.fastq.gz",
-        R2 = "data/reads/raw/{sample}_{library}.R2.fastq.gz",
+        R1 = raw_outpath + "/{sample}_{library}.R1.fastq.gz",
+        R2 = raw_outpath + "/{sample}_{library}.R2.fastq.gz",
     shell:
         """
         cd data/reads/raw
@@ -80,8 +82,8 @@ rule symlink_libraries_uncompressed:
         R2 = lambda wildcards: get_datasets_for_symlinks(datasets_tab, sample=wildcards.sample,
                                                          library=wildcards.library, d="R2")
     output:
-        R1 = "data/reads/raw/{sample}_{library}.R1.fastq",
-        R2 = "data/reads/raw/{sample}_{library}.R2.fastq",
+        R1 = raw_outpath + "/{sample}_{library}.R1.fastq",
+        R2 = raw_outpath + "/{sample}_{library}.R2.fastq",
     shell:
         """
         cd data/reads/
@@ -91,8 +93,10 @@ rule symlink_libraries_uncompressed:
 
 rule fastqc_raw:
     input:
-        R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
-        R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
+        R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
+        R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
+        # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
+        # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
         html_report_R1 =  os.path.join(qc_fastqc_raw, "{sample}_{library}.R1_fastqc.html"), #.R1_fastqc.html
         html_report_R2 =  os.path.join(qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
@@ -126,8 +130,10 @@ rule trimmomatic:
         out1U = os.path.join(trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
         out2U = os.path.join(trimmomatic_outpath, "{sample}_{library}.2U.fastq.gz"),
     input:
-        R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
-        R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
+        R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
+        R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
+        # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
+        # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
         out1P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
         out2P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
@@ -239,7 +245,7 @@ rule assembly_qc:
         R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),
     output:
-        pdf = "qc/quast/{sample}/report.pdf"
+        pdf = os.path.join(results_dir, "qc/quast/{sample}/report.pdf")
     params:
         outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")
     conda:
@@ -255,7 +261,7 @@ rule annotation:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        sqn = "annotation/prokka/{sample}/{sample}.sqn"
+        sqn = os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn")
     params:
         outdir = lambda wildcards, output: os.path.split(output.sqn)[0]
     conda:
@@ -263,7 +269,7 @@ rule annotation:
     threads:
         10
     log:
-        "logs/annotation/prokka/{sample}.log"
+        os.path.join(results_dir, "logs/annotation/prokka/{sample}.log")
     script:
         "scripts/prokka.py"
 
@@ -271,7 +277,7 @@ rule abricate:
     input:
         sqn = rules.annotation.output.sqn
     output:
-        done = "annotation/abricate/{sample}.done"
+        done = os.path.join(results_dir, "annotation/abricate/{sample}.done")
     conda:
         "envs/abricate.yml"
     threads:
@@ -283,13 +289,13 @@ rule abricate:
 
 rule abricate_summary:
     input:
-        expand("annotation/abricate/{sample}.done", sample=sample_list)
+        expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list)
     output:
-        "reports/abricate.html"
+        os.path.join(results_dir, "reports/abricate.html")
     params:
         abricate_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:
-        "logs/annotation/abricate/aggregate.log"
+        os.path.join(results_dir, "logs/annotation/abricate/aggregate.log")
     conda:
         "envs/r-stuff.yml"
     script:
@@ -297,10 +303,10 @@ rule abricate_summary:
 
 rule multiqc_all:
     input:
-        expand("qc/quast/{sample}/report.pdf", sample=sample_list),
-        expand("annotation/prokka/{sample}/{sample}.sqn", sample=sample_list),
+        expand(os.path.join(results_dir, "qc/quast/{sample}/report.pdf"), sample=sample_list),
+        expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
     output:
-        report = "reports/multiqc_report.html"
+        report = os.path.join(results_dir, "reports/multiqc_report.html")
     conda:
         "envs/wgs.yml"
     log:

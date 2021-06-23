@@ -52,7 +52,7 @@ rule all:
         os.path.join(results_dir, "reports/abricate.html"),
         expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list),
         expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
-        expand(os.path.join(results_dir, "assembly/spades/{sample}/pipeline_state/stage_9_terminate"), sample=sample_list),
+        expand(os.path.join(results_dir, "assembly/spades/{sample}/scaffolds.fasta"), sample=sample_list),
         expand(os.path.join(results_dir, "qc/quast/{sample}/report.pdf"), sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder=reads_raw_source,
                      outfolder=raw_outpath),
@@ -228,9 +228,9 @@ rule assembly:
         R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
     output:
-        final_file = os.path.join(assembly_spades_outpath, "{sample}/pipeline_state/stage_9_terminate")
+        final_file = os.path.join(assembly_spades_outpath, "{sample}/scaffolds.fasta")
     params:
-        outdir = lambda wildcards, output: output.final_file.replace("/pipeline_state/stage_9_terminate", "")
+        outdir = lambda wildcards, output: output.final_file.replace("/scaffolds.fasta", "")
     conda:
         "envs/wgs.yml"
     threads:

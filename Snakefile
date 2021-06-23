@@ -25,7 +25,6 @@ from modules.general import (
     sam_cov_handle2gapped_fasta, trimmomatic_input
 )
 
-# fields: sample  ref_genome_mt   ref_genome_n
 analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", datasets_tab_file="data/datasets.tab")
 sample_list = list(analysis_tab["sample"])
 # analysis_tab, reference_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", reference_tab_file="data/reference_genomes.tab", datasets_tab_file="data/datasets.tab")
@@ -43,6 +42,10 @@ raw_outpath         = os.path.join(results_dir, config["reads_raw"])
 trimmomatic_outpath = os.path.join(results_dir, config["read_processing"]["trimmomatic"]["outdir"])
 #
 assembly_spades_outpath = os.path.join(results_dir, config["assembly"]["spades"]["outdir"])
+
+# parse run tabs
+analysis_tab, datasets_tab = parse_config_tabs(analysis_tab_file="data/analysis.tab", datasets_tab_file="data/datasets.tab")
+sample_list = list(analysis_tab["sample"])
 
 rule all:
     input:

@@ -321,5 +321,5 @@ rule multiqc_all:
         multiqc -f \
         -x {assembly_spades_outpath} \
         -x {raw_outpath} \
-        -o {params.multiqc_res_dir} .
+        -o {params.multiqc_res_dir} . &> {log}
         """

@@ -32,6 +32,7 @@ analysis_tab_file = config["analysis_tab_file"]
 datasets_tab_file = config["datasets_tab_file"]
 
 results_dir = config["results_dir"]
+qc                 = os.path.join(results_dir, config["qc"])
 qc_fastqc_raw      = os.path.join(results_dir, config["qc"]["fastqc"]["raw"])
 qc_fastqc_filtered = os.path.join(results_dir, config["qc"]["fastqc"]["filtered"])
 fastqc_folders = {"raw" : qc_fastqc_raw, "filtered" : qc_fastqc_filtered}
@@ -312,7 +313,8 @@ rule multiqc_all:
     conda:
         "envs/wgs.yml"
     params:
-        multiqc_res_dir = lambda wildcards, output: os.path.split(output[0])[0]
+        multiqc_res_dir = lambda wildcards, output: os.path.split(output[0])[0],
+        log_dir = os.path.join(results_dir, "logs")
         # assembly_dir    = os.path.join(results_dir, 
     log:
         os.path.join(results_dir, "logs/qc/multiqc.log")
@@ -321,5 +323,7 @@ rule multiqc_all:
         multiqc -f \
         -x {assembly_spades_outpath} \
         -x {raw_outpath} \
-        -o {params.multiqc_res_dir} . &> {log}
+        -o {params.multiqc_res_dir} \
+        {qc} \
+        {params.log_dir} &> {log}
         """

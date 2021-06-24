@@ -10,6 +10,7 @@ species:
 reads_raw: "data/reads/raw"
 
 qc:
+    qc: "qc"
     fastqc:
         raw: "qc/data/reads/raw"
         filtered: "qc/data/reads/filtered"

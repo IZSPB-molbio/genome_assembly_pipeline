@@ -32,7 +32,7 @@ analysis_tab_file = config["analysis_tab_file"]
 datasets_tab_file = config["datasets_tab_file"]
 
 results_dir = config["results_dir"]
-qc                 = os.path.join(results_dir, config["qc"])
+qc                 = os.path.join(results_dir, config["qc"]["qc"])
 qc_fastqc_raw      = os.path.join(results_dir, config["qc"]["fastqc"]["raw"])
 qc_fastqc_filtered = os.path.join(results_dir, config["qc"]["fastqc"]["filtered"])
 fastqc_folders = {"raw" : qc_fastqc_raw, "filtered" : qc_fastqc_filtered}

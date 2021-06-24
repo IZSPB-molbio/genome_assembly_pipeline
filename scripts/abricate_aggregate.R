@@ -11,8 +11,15 @@ read.abricate <- function(x){
     return(t)
 }
 
+# parse args from snakemake rule
+# all messages in the log
+abricate_res_dir <- snakemake@params[[1]]
+abricate_summary <- snakemake@output[[1]]
+log <- file(snakemake@log[[1]], open="wt")
+sink(log)
+
 # craft the table
-abricate.results.files <- list.files(path = "annotation/abricate", pattern = "*_*.out", full.names = TRUE)
+abricate.results.files <- list.files(path = abricate_res_dir, pattern = "*_*.out", full.names = TRUE)
 #print(abricate.results.files)
 abricate.results <- data.frame(do.call("rbind", lapply(abricate.results.files, read.abricate))) %>% mutate(resistance=tolower(resistance))
 
@@ -38,4 +45,4 @@ abricate.results %>%
             c('copy', 'csv', 'excel'))
     ),
     rownames = FALSE) %>%
-	htmlwidgets::saveWidget("reports/abricate.html", selfcontained=TRUE)
+	htmlwidgets::saveWidget(abricate_summary, selfcontained=TRUE)

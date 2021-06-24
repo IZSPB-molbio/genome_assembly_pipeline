@@ -318,8 +318,8 @@ rule multiqc_all:
         os.path.join(results_dir, "logs/qc/multiqc.log")
     shell:
         """
-        multiqc -fo \
+        multiqc -f \
         -x {assembly_spades_outpath} \
         -x {raw_outpath} \
-        {params.multiqc_res_dir} .
+        -o {params.multiqc_res_dir} .
         """

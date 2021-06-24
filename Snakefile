@@ -311,9 +311,15 @@ rule multiqc_all:
         report = os.path.join(results_dir, "reports/multiqc_report.html")
     conda:
         "envs/wgs.yml"
+    params:
+        multiqc_res_dir = lambda wildcards, output: os.path.split(output[0])[0]
+        # assembly_dir    = os.path.join(results_dir, 
     log:
         os.path.join(results_dir, "logs/qc/multiqc.log")
     shell:
         """
-        multiqc -fo reports/ .
+        multiqc -fo \
+        -x {assembly_spades_outpath} \
+        -x {raw_outpath} \
+        {params.multiqc_res_dir} .
         """

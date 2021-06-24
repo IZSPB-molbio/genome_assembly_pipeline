@@ -73,7 +73,7 @@ rule symlink_libraries:
         R2 = raw_outpath + "/{sample}_{library}.R2.fastq.gz",
     shell:
         """
-        cd {{raw_outpath}}
+        cd {raw_outpath}
         ln -sf {input.R1} $(basename {output.R1})
         ln -sf {input.R2} $(basename {output.R2})
         """
@@ -89,7 +89,7 @@ rule symlink_libraries_uncompressed:
         R2 = raw_outpath + "/{sample}_{library}.R2.fastq",
     shell:
         """
-        cd {{raw_outpath}}
+        cd {raw_outpath}
         ln -sf {input.R1} $(basename {output.R1})
         ln -sf {input.R2} $(basename {output.R2})
         """

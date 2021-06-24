@@ -13,27 +13,30 @@ input_R2 = snakemake.input.R2
 input_U  = snakemake.input.U
 outdir   = snakemake.params.outdir
 threads  = snakemake.threads
+log      = snakemake.log[0]
 
-pe1 = ""
-pe2 = ""
-me  = ""
-
-for e in input_R1:
-    pe1 += "--pe1 {e} ".format(e=e)
-
-for e in input_R2:
-    pe2 += "--pe2 {e} ".format(e=e)
-
-for e in input_U:
-    me  += "--single {e} ".format(e=e)
-
-shell("""
-    quast \
-    -o {outdir} \
-    -l {sample} \
-    {pe1} \
-    {pe2} \
-    {me} \
-    -t {threads} --glimmer \
-    {assembly}
-    """)
+with open(log, "w") as f:
+    sys.stderr = sys.stdout = f
+    pe1 = ""
+    pe2 = ""
+    me  = ""
+    
+    for e in input_R1:
+        pe1 += "--pe1 {e} ".format(e=e)
+    
+    for e in input_R2:
+        pe2 += "--pe2 {e} ".format(e=e)
+    
+    for e in input_U:
+        me  += "--single {e} ".format(e=e)
+    
+    shell("""
+        quast \
+        -o {outdir} \
+        -l {sample} \
+        {pe1} \
+        {pe2} \
+        {me} \
+        -t {threads} --glimmer \
+        {assembly}
+        """)

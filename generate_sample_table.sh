@@ -38,7 +38,7 @@ fi
 echo -e "Adding samples\n"
 if [ $existing = 0 ] ; then
 	echo -e "Creating new sample table: ${name}\n"
- 	echo -e "sample\tR1\tR2" > ${name} && echo -e "sample\tR1\tR2"
+ 	echo -e "sample\tlibrary\tR1\tR2" > ${name} && echo -e "sample\tlibrary\tR1\tR2"
 else
 	filename=$(basename $existing)
 	if [ -f ""$existing"" ] ; then
@@ -61,7 +61,7 @@ if [ ! $database_dir = 0 ]; then
 			for (( i=1; i<=$count; i++ )); do
 				r1=$(ls $database_dir/${sample}*_L00${i}_R1* | grep /${sample}_) 
 				r2=$(ls $database_dir/${sample}*_L00${i}_R2* | grep /${sample}_)
-				echo -e "${sample}\t${r1}\t${r2}" >> ${name} && echo -e "${sample}\t${r1}\t${r2}"
+				echo -e "${sample}\t1\t${r1}\t${r2}" >> ${name} && echo -e "${sample}\t1\t${r1}\t${r2}"
 			done
 			samples_dir+=("${sample}") # sample passed
 		fi

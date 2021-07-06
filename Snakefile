@@ -128,6 +128,7 @@ rule trimmomatic:
         mem = config['read_processing']['trimmomatic']['java_vm_mem'],
         options = config['read_processing']['trimmomatic']['options'],
         processing_options = config['read_processing']['trimmomatic']['processing_options'],
+        adapters = config['read_processing']['trimmomatic']['adapters'],
         out1P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
         out2P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
         out1U = os.path.join(trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
@@ -152,7 +153,7 @@ rule trimmomatic:
     conda: "envs/wgs.yml"
     shell:
         """
-        export tap=$(which trimmomatic | sed 's/bin\/trimmomatic/share\/trimmomatic\/adapters\/TruSeq3-PE.fa/g')
+        export tap=$(which trimmomatic | sed "s/bin\/trimmomatic/share\/trimmomatic\/adapters\/{params.adapters}/g")
         
         trimmomatic PE {params.options} \
         -threads {threads} {input.R1} {input.R2} \

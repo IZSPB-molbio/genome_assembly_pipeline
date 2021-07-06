@@ -21,9 +21,9 @@ read_processing:
         options: "-phred33"
         processing_options: "LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
         java_cmd: "java"
-        #jar_file: "/crex/proj/uppstore2018171/conda_envs/mtoolbox-ark/share/trimmomatic/trimmomatic.jar"
         java_vm_mem: "4G"
         threads: 5
+        adapters: "NexteraPE-PE.fa"
 
 assembly:
     spades:

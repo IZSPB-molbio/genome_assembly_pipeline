@@ -51,6 +51,7 @@ rule all:
     input:
         os.path.join(results_dir, "reports/multiqc_report.html"),
         os.path.join(results_dir, "reports/abricate.html"),
+        os.path.join(results_dir, "sequence_typing/all_mlst.out"),
         expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list),
         expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
         expand(os.path.join(results_dir, "assembly/spades/{sample}/scaffolds.fasta"), sample=sample_list),
@@ -327,4 +328,36 @@ rule multiqc_all:
         -o {params.multiqc_res_dir} \
         {qc} \
         {params.log_dir} &> {log}
+        """
+
+rule mlst:
+    input:
+        assembly = rules.assembly.output.final_file,
+    output:
+        mlst = os.path.join(results_dir, "sequence_typing/{sample}_mlst.out")
+    params:
+        outdir = lambda wildcards, output: os.path.split(output.mlst)[0]
+    conda:
+        "envs/mlst.yml"
+    threads:
+        1
+    log:
+        os.path.join(results_dir, "logs/sequence_typing/mlst/{sample}.log")
+    script:
+        "scripts/mlst.py"
+
+rule mlst_collate:
+    input:
+        expand(os.path.join(results_dir, "sequence_typing/{sample}_mlst.out"), sample=sample_list)
+    output:
+        os.path.join(results_dir, "sequence_typing/all_mlst.out")
+    params:
+        mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
+    log:
+        os.path.join(results_dir, "logs/sequence_typing/mlst/aggregate.log")
+    # conda:
+    #     "envs/r-stuff.yml"
+    shell:
+        """
+        cat {input} > {output}
         """

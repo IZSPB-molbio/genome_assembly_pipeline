@@ -154,7 +154,8 @@ rule trimmomatic:
     conda: "envs/wgs.yml"
     shell:
         """
-        export tap=$(which trimmomatic | sed "s/bin\/trimmomatic/share\/trimmomatic\/adapters\/{params.adapters}/g")
+        # export tap=$(which trimmomatic | sed "s/bin\/trimmomatic/share\/trimmomatic\/adapters\/{params.adapters}/g")
+        export tap="data/all_adapters.fasta"
         
         trimmomatic PE {params.options} \
         -threads {threads} {input.R1} {input.R2} \

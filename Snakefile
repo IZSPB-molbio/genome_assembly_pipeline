@@ -286,7 +286,7 @@ rule referenceseeker:
     output:
         res = os.path.join(results_dir, "qc/referenceseeker/{sample}.tab")
     conda:
-        "envs/referenceseeker.yaml"
+        "envs/referenceseeker.yml"
     threads:
         10
     log:

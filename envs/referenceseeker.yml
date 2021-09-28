@@ -1,0 +1,8 @@
+name: referenceseeker
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - referenceseeker

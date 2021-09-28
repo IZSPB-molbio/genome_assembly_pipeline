@@ -13,12 +13,12 @@ outfile       = snakemake.output.res
 threads       = snakemake.threads
 log           = snakemake.log[0]
 
-with open(outfile, "w") as f:
+with open(log, "w") as f:
     sys.stderr = sys.stdout = f
     
     shell("""
         referenceseeker \
         --threads {threads} \
         data/referenceseeker/bacteria-refseq \
-        {assembly_file} 
+        {assembly_file} > {outfile}
         """)

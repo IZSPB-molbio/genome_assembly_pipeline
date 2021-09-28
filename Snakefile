@@ -52,6 +52,7 @@ rule all:
         os.path.join(results_dir, "reports/multiqc_report.html"),
         os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "sequence_typing/all_mlst.out"),
+        expand(os.path.join(results_dir, "qc/referenceseeker/{sample}.tab"), sample=sample_list),
         expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list),
         expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
         expand(os.path.join(results_dir, "assembly/spades/{sample}/scaffolds.fasta"), sample=sample_list),
@@ -278,6 +279,20 @@ rule annotation:
         os.path.join(results_dir, "logs/annotation/prokka/{sample}.log")
     script:
         "scripts/prokka.py"
+
+rule referenceseeker:
+    input:
+        assembly = rules.assembly.output.final_file,
+    output:
+        res = os.path.join(results_dir, "qc/referenceseeker/{sample}.tab")
+    conda:
+        "envs/referenceseeker.yaml"
+    threads:
+        10
+    log:
+        os.path.join(results_dir, "logs/qc/referenceseeker/{sample}.log")
+    script:
+        "scripts/referenceseeker.py"
 
 rule abricate:
     input:

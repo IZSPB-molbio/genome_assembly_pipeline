@@ -9,3 +9,4 @@
 - Annotation: Prokka (v1.8) - doi:10.1093/bioinformatics/btu153
 - AMR and VF prediction: ABRicate - https://github.com/tseemann/abricate
 - MLST typing: MLST - https://github.com/tseemann/mlst
+- Determine closely related reference genomes: ReferenceSeeker - https://github.com/oschwengers/referenceseeker

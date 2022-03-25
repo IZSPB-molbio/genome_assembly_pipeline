@@ -357,6 +357,8 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
         if getattr(row, "sample") in samples:
             fastqc_out.append(
                 os.path.join(
+                    "{sample}".format(
+                        sample=getattr(row, "sample")),
                     outfolder,
                     "{sample}_{library}{suffix}".format(
                         sample=getattr(row, "sample"),
@@ -367,6 +369,8 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
             )
             fastqc_out.append(
                 os.path.join(
+                    "{sample}".format(
+                        sample=getattr(row, "sample")),
                     outfolder,
                     "{sample}_{library}{suffix}".format(
                         sample=getattr(row, "sample"),
@@ -378,6 +382,8 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
             if out == "filtered":
                 fastqc_out.append(
                     os.path.join(
+                        "{sample}".format(
+                            sample=getattr(row, "sample")),
                         outfolder,
                         "{sample}_{library}{suffix}".format(
                             sample=getattr(row, "sample"),

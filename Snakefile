@@ -49,14 +49,16 @@ sample_list = list(analysis_tab["sample"])
 
 rule all:
     input:
-        os.path.join(results_dir, "reports/multiqc_report.html"),
-        os.path.join(results_dir, "reports/abricate.html"),
-        os.path.join(results_dir, "sequence_typing/all_mlst.out"),
-        expand(os.path.join(results_dir, "qc/referenceseeker/{sample}.tab"), sample=sample_list),
-        expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list),
-        expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
-        expand(os.path.join(results_dir, "assembly/spades/{sample}/scaffolds.fasta"), sample=sample_list),
-        expand(os.path.join(results_dir, "qc/quast/{sample}/report.pdf"), sample=sample_list),
+        # os.path.join(results_dir, "reports/multiqc_report.html"),
+        # os.path.join(results_dir, "reports/abricate.html"),
+        os.path.join(results_dir, "all_mlst.out"),
+        expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/annotation/abricate/{sample}.done"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/assembly/spades/{sample}/scaffolds.fasta"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/qc/quast/{sample}/report.pdf"), sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder=reads_raw_source,
                      outfolder=raw_outpath),
         fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
@@ -103,10 +105,10 @@ rule fastqc_raw:
         # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
         # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
-        html_report_R1 =  os.path.join(qc_fastqc_raw, "{sample}_{library}.R1_fastqc.html"), #.R1_fastqc.html
-        html_report_R2 =  os.path.join(qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
+        html_report_R1 =  os.path.join("{sample}", qc_fastqc_raw, "{sample}_{library}.R1_fastqc.html"), #.R1_fastqc.html
+        html_report_R2 =  os.path.join("{sample}", qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
     params:
-        outDir = qc_fastqc_raw,
+        outDir = os.path.join("{sample}", qc_fastqc_raw)
     threads:
         2
     # version:
@@ -114,7 +116,7 @@ rule fastqc_raw:
     # message:
     #     "QC of raw read files {input} with {version}, {wildcards}"
     log:
-        os.path.join(results_dir, "logs/qc/data/reads/raw/{sample}_{library}.log")
+        os.path.join(results_dir, "{sample}/logs/qc/data/reads/raw/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -131,19 +133,19 @@ rule trimmomatic:
         options = config['read_processing']['trimmomatic']['options'],
         processing_options = config['read_processing']['trimmomatic']['processing_options'],
         adapters = config['read_processing']['trimmomatic']['adapters'],
-        out1P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
-        out2P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
-        out1U = os.path.join(trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
-        out2U = os.path.join(trimmomatic_outpath, "{sample}_{library}.2U.fastq.gz"),
+        out1P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
+        out2P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
+        out1U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
+        out2U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.2U.fastq.gz"),
     input:
         R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
         R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
         # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
         # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
-        out1P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
-        out2P = os.path.join(trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
-        out1U = os.path.join(trimmomatic_outpath, "{sample}_{library}.U.fastq.gz"),
+        out1P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
+        out2P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
+        out1U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.U.fastq.gz"),
     threads:
         config['read_processing']['trimmomatic']['threads']
     # version:
@@ -151,7 +153,7 @@ rule trimmomatic:
     # message:
     #     "Filtering read dataset {wildcards.sample}_{wildcards.library} with Trimmomatic. {wildcards}" # v{version}"
     log:
-        os.path.join(results_dir, "logs/data/reads/filtered/{sample}_{library}_trimmomatic.log")
+        os.path.join(results_dir, "{sample}/logs/data/reads/filtered/{sample}_{library}_trimmomatic.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -176,11 +178,11 @@ rule fastqc_filtered:
         out2P = rules.trimmomatic.output.out2P,
         out1U = rules.trimmomatic.output.out1U,
     output:
-        html_report_R1 = os.path.join(qc_fastqc_filtered, "{sample}_{library}.R1_fastqc.html"),
-        html_report_R2 = os.path.join(qc_fastqc_filtered, "{sample}_{library}.R2_fastqc.html"),
-        html_report_U  = os.path.join(qc_fastqc_filtered, "{sample}_{library}.U_fastqc.html"),
+        html_report_R1 = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.R1_fastqc.html"),
+        html_report_R2 = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.R2_fastqc.html"),
+        html_report_U  = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.U_fastqc.html"),
     params:
-        outDir = qc_fastqc_filtered
+        outDir = os.path.join("{sample}", qc_fastqc_filtered)
     threads:
         3
     # version:
@@ -188,7 +190,7 @@ rule fastqc_filtered:
     # message:
     #     "QC of filtered read files {input} with {version}"
     log:
-        os.path.join(results_dir, "logs/qc/data/reads/filtered/{sample}_{library}.log")
+        os.path.join(results_dir, "{sample}/logs/qc/data/reads/filtered/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -209,7 +211,7 @@ rule merge_PE:
     params:
         outdir = lambda wildcards, output: os.path.split(output.R1)[0]
     log:
-        os.path.join(results_dir, "logs/data/reads/filtered/flash/{sample}_{library}.log")
+        os.path.join(results_dir, "{sample}/logs/data/reads/filtered/flash/{sample}_{library}.log")
     conda: "envs/wgs.yml"
     shell:
         """
@@ -233,7 +235,7 @@ rule assembly:
         R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
     output:
-        final_file = os.path.join(assembly_spades_outpath, "{sample}/scaffolds.fasta")
+        final_file = os.path.join(results_dir, "{sample}/assembly/spades/{sample}/scaffolds.fasta")
     params:
         outdir = lambda wildcards, output: output.final_file.replace("/scaffolds.fasta", "")
     conda:
@@ -241,7 +243,7 @@ rule assembly:
     threads:
         10
     log:
-        os.path.join(results_dir, "logs/assembly/spades/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/assembly/spades/{sample}.log")
     script:
         "scripts/spades.py"
 
@@ -252,7 +254,7 @@ rule assembly_qc:
         R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
         U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),
     output:
-        pdf = os.path.join(results_dir, "qc/quast/{sample}/report.pdf")
+        pdf = os.path.join(results_dir, "{sample}/qc/quast/{sample}/report.pdf")
     params:
         outdir = lambda wildcards, output: output.pdf.replace("/report.pdf", "")
     conda:
@@ -260,7 +262,7 @@ rule assembly_qc:
     threads:
         10
     log:
-        os.path.join(results_dir, "logs/qc/quast/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/qc/quast/{sample}.log")
     script:
         "scripts/quast.py"
 
@@ -268,7 +270,7 @@ rule annotation:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        sqn = os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn")
+        sqn = os.path.join(results_dir, "{sample}/annotation/prokka/{sample}/{sample}.sqn")
     params:
         outdir = lambda wildcards, output: os.path.split(output.sqn)[0]
     conda:
@@ -276,7 +278,7 @@ rule annotation:
     threads:
         10
     log:
-        os.path.join(results_dir, "logs/annotation/prokka/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/annotation/prokka/{sample}.log")
     script:
         "scripts/prokka.py"
 
@@ -284,13 +286,13 @@ rule referenceseeker:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        res = os.path.join(results_dir, "qc/referenceseeker/{sample}.tab")
+        res = os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab")
     conda:
         "envs/referenceseeker.yml"
     threads:
         10
     log:
-        os.path.join(results_dir, "logs/qc/referenceseeker/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/qc/referenceseeker/{sample}.log")
     script:
         "scripts/referenceseeker.py"
 
@@ -298,36 +300,38 @@ rule abricate:
     input:
         sqn = rules.annotation.output.sqn
     output:
-        done = os.path.join(results_dir, "annotation/abricate/{sample}.done")
+        done = os.path.join(results_dir, "{sample}/annotation/abricate/{sample}.done")
     conda:
         "envs/abricate.yml"
     threads:
         4
     log:
-        os.path.join(results_dir, "logs/annotation/abricate/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/annotation/abricate/{sample}.log")
     script:
         "scripts/abricate.py"
 
 rule abricate_summary:
+    """Collate abricate results for single sample"""
     input:
-        expand(os.path.join(results_dir, "annotation/abricate/{sample}.done"), sample=sample_list)
+        expand(os.path.join(results_dir, "{sample}/annotation/abricate/{sample}.done"), sample=sample_list)
     output:
-        os.path.join(results_dir, "reports/abricate.html")
+        os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html")
     params:
         abricate_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:
-        os.path.join(results_dir, "logs/annotation/abricate/aggregate.log")
+        os.path.join(results_dir, "{sample}/logs/annotation/abricate/aggregate.log")
     conda:
         "envs/r-stuff.yml"
     script:
         "scripts/abricate_aggregate.R"
 
 rule multiqc_all:
+    """MultiQC report for single file"""
     input:
-        expand(os.path.join(results_dir, "qc/quast/{sample}/report.pdf"), sample=sample_list),
-        expand(os.path.join(results_dir, "annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/qc/quast/{sample}/report.pdf"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
     output:
-        report = os.path.join(results_dir, "reports/multiqc_report.html")
+        report = os.path.join(results_dir, "{sample}/reports/multiqc_report.html")
     conda:
         "envs/wgs.yml"
     params:
@@ -335,7 +339,7 @@ rule multiqc_all:
         log_dir = os.path.join(results_dir, "logs")
         # assembly_dir    = os.path.join(results_dir, 
     log:
-        os.path.join(results_dir, "logs/qc/multiqc.log")
+        os.path.join(results_dir, "{sample}/logs/qc/multiqc.log")
     shell:
         """
         multiqc -f \
@@ -350,7 +354,7 @@ rule mlst:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        mlst = os.path.join(results_dir, "sequence_typing/{sample}_mlst.out")
+        mlst = os.path.join(results_dir, "{sample}/sequence_typing/{sample}_mlst.out")
     params:
         outdir = lambda wildcards, output: os.path.split(output.mlst)[0]
     conda:
@@ -358,15 +362,15 @@ rule mlst:
     threads:
         1
     log:
-        os.path.join(results_dir, "logs/sequence_typing/mlst/{sample}.log")
+        os.path.join(results_dir, "{sample}/logs/sequence_typing/mlst/{sample}.log")
     script:
         "scripts/mlst.py"
 
 rule mlst_collate:
     input:
-        expand(os.path.join(results_dir, "sequence_typing/{sample}_mlst.out"), sample=sample_list)
+        expand(os.path.join(results_dir, "{sample}/sequence_typing/{sample}_mlst.out"), sample=sample_list)
     output:
-        os.path.join(results_dir, "sequence_typing/all_mlst.out")
+        os.path.join(results_dir, "all_mlst.out")
     params:
         mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:

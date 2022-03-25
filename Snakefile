@@ -33,13 +33,13 @@ datasets_tab_file = config["datasets_tab_file"]
 
 results_dir = config["results_dir"]
 qc                 = os.path.join(results_dir, config["qc"]["qc"])
-qc_fastqc_raw      = os.path.join(results_dir, config["qc"]["fastqc"]["raw"])
-qc_fastqc_filtered = os.path.join(results_dir, config["qc"]["fastqc"]["filtered"])
+qc_fastqc_raw      = os.path.join(config["qc"]["fastqc"]["raw"])
+qc_fastqc_filtered = os.path.join(config["qc"]["fastqc"]["filtered"])
 fastqc_folders = {"raw" : qc_fastqc_raw, "filtered" : qc_fastqc_filtered}
 #
 reads_raw_source    = config["reads_raw_source"]
 raw_outpath         = os.path.join(results_dir, config["reads_raw"])
-trimmomatic_outpath = os.path.join(results_dir, config["read_processing"]["trimmomatic"]["outdir"])
+trimmomatic_outpath = os.path.join(config["read_processing"]["trimmomatic"]["outdir"])
 #
 assembly_spades_outpath = os.path.join(results_dir, config["assembly"]["spades"]["outdir"])
 
@@ -61,8 +61,10 @@ rule all:
         expand(os.path.join(results_dir, "{sample}/qc/quast/{sample}/report.pdf"), sample=sample_list),
         get_symlinks(datasets_tab, analysis_tab=analysis_tab, infolder=reads_raw_source,
                      outfolder=raw_outpath),
-        fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
-        fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered", fastqc_folders = fastqc_folders),
+        # fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders),
+        # fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered", fastqc_folders = fastqc_folders),
+        expand(fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="raw", fastqc_folders = fastqc_folders, results_dir = results_dir)),
+        expand(fastqc_outputs(datasets_tab, analysis_tab=analysis_tab, out="filtered", fastqc_folders = fastqc_folders, results_dir = results_dir)),
 
 rule symlink_libraries:
     input:
@@ -105,10 +107,10 @@ rule fastqc_raw:
         # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
         # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
-        html_report_R1 =  os.path.join("{sample}", qc_fastqc_raw, "{sample}_{library}.R1_fastqc.html"), #.R1_fastqc.html
-        html_report_R2 =  os.path.join("{sample}", qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
+        html_report_R1 =  os.path.join(results_dir, "{sample}", qc_fastqc_raw, "{sample}_{library}.R1_fastqc.html"), #.R1_fastqc.html
+        html_report_R2 =  os.path.join(results_dir, "{sample}", qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
     params:
-        outDir = os.path.join("{sample}", qc_fastqc_raw)
+        outDir = os.path.join(results_dir, "{sample}", qc_fastqc_raw)
     threads:
         2
     # version:
@@ -133,19 +135,19 @@ rule trimmomatic:
         options = config['read_processing']['trimmomatic']['options'],
         processing_options = config['read_processing']['trimmomatic']['processing_options'],
         adapters = config['read_processing']['trimmomatic']['adapters'],
-        out1P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
-        out2P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
-        out1U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
-        out2U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.2U.fastq.gz"),
+        out1P = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
+        out2P = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
+        out1U = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.1U.fastq.gz"),
+        out2U = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.2U.fastq.gz"),
     input:
         R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
         R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
         # R1 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[0],
         # R2 = lambda wildcards: trimmomatic_input(datasets_tab=datasets_tab, sample=wildcards.sample, library=wildcards.library, infolder=raw_outpath)[1],
     output:
-        out1P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
-        out2P = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
-        out1U = os.path.join("{sample}", trimmomatic_outpath, "{sample}_{library}.U.fastq.gz"),
+        out1P = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.R1.fastq.gz"),
+        out2P = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.R2.fastq.gz"),
+        out1U = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.U.fastq.gz"),
     threads:
         config['read_processing']['trimmomatic']['threads']
     # version:
@@ -178,11 +180,11 @@ rule fastqc_filtered:
         out2P = rules.trimmomatic.output.out2P,
         out1U = rules.trimmomatic.output.out1U,
     output:
-        html_report_R1 = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.R1_fastqc.html"),
-        html_report_R2 = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.R2_fastqc.html"),
-        html_report_U  = os.path.join("{sample}", qc_fastqc_filtered, "{sample}_{library}.U_fastqc.html"),
+        html_report_R1 = os.path.join(results_dir, "{sample}", qc_fastqc_filtered, "{sample}_{library}.R1_fastqc.html"),
+        html_report_R2 = os.path.join(results_dir, "{sample}", qc_fastqc_filtered, "{sample}_{library}.R2_fastqc.html"),
+        html_report_U  = os.path.join(results_dir, "{sample}", qc_fastqc_filtered, "{sample}_{library}.U_fastqc.html"),
     params:
-        outDir = os.path.join("{sample}", qc_fastqc_filtered)
+        outDir = os.path.join(results_dir, "{sample}", qc_fastqc_filtered)
     threads:
         3
     # version:
@@ -205,9 +207,9 @@ rule merge_PE:
         R1 = rules.trimmomatic.output.out1P,
         R2 = rules.trimmomatic.output.out2P,
     output:
-        R1 = os.path.join(trimmomatic_outpath, "{sample}_{library}.notCombined_1.fastq.gz"),
-        R2 = os.path.join(trimmomatic_outpath, "{sample}_{library}.notCombined_2.fastq.gz"),
-        U = os.path.join(trimmomatic_outpath, "{sample}_{library}.extendedFrags.fastq.gz"),
+        R1 = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.notCombined_1.fastq.gz"),
+        R2 = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.notCombined_2.fastq.gz"),
+        U = os.path.join(results_dir, "{sample}", trimmomatic_outpath, "{sample}_{library}.extendedFrags.fastq.gz"),
     params:
         outdir = lambda wildcards, output: os.path.split(output.R1)[0]
     log:
@@ -231,9 +233,21 @@ rule assembly:
     # otherwise need to use --pe<#>-1, --pe<#>-2, --pe<#>-m
     # at the moment, SE reads are left behind. 
     input:
-        R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
-        R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
-        U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
+        # R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
+        # R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
+        # U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath)
+        R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="R1",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath)),
+        R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="R2",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath)),
+        U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="U",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath))
     output:
         final_file = os.path.join(results_dir, "{sample}/assembly/spades/{sample}/scaffolds.fasta")
     params:
@@ -250,9 +264,18 @@ rule assembly:
 rule assembly_qc:
     input:
         assembly = rules.assembly.output.final_file,
-        R1       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R1", infolder=trimmomatic_outpath),
-        R2       = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="R2", infolder=trimmomatic_outpath),
-        U        = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab, sample=wildcards.sample, mate="U", infolder=trimmomatic_outpath),
+        R1 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="R1",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath)),
+        R2 = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="R2",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath)),
+        U  = lambda wildcards: get_files_assembly(datasets_tab=datasets_tab,
+                                                    sample=wildcards.sample,
+                                                    mate="U",
+                                                    infolder=os.path.join(results_dir, wildcards.sample, trimmomatic_outpath))
     output:
         pdf = os.path.join(results_dir, "{sample}/qc/quast/{sample}/report.pdf")
     params:

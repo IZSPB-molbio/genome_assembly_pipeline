@@ -323,6 +323,7 @@ def get_mt_fasta(df, ref_genome_mt, field):
 def fastqc_outputs(datasets_tab: pd.DataFrame,
                    analysis_tab: pd.DataFrame,
                    fastqc_folders: dict = None,
+                   results_dir: str = None,
                    out: str = "raw") -> List[str]:
     """ Return a list of output filenames where FastQC results will be stored.
 
@@ -357,6 +358,7 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
         if getattr(row, "sample") in samples:
             fastqc_out.append(
                 os.path.join(
+                    results_dir,
                     "{sample}".format(
                         sample=getattr(row, "sample")),
                     outfolder,
@@ -369,6 +371,7 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
             )
             fastqc_out.append(
                 os.path.join(
+                    results_dir,
                     "{sample}".format(
                         sample=getattr(row, "sample")),
                     outfolder,
@@ -382,6 +385,7 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
             if out == "filtered":
                 fastqc_out.append(
                     os.path.join(
+                        results_dir,
                         "{sample}".format(
                             sample=getattr(row, "sample")),
                         outfolder,

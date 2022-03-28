@@ -51,7 +51,7 @@ rule all:
     input:
         # os.path.join(results_dir, "reports/multiqc_report.html"),
         # os.path.join(results_dir, "reports/abricate.html"),
-        os.path.join(results_dir, "all_mlst.out"),
+        os.path.join(results_dir, "all/all_mlst.out"),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),
@@ -393,7 +393,7 @@ rule mlst_collate:
     input:
         expand(os.path.join(results_dir, "{sample}/sequence_typing/{sample}_mlst.out"), sample=sample_list)
     output:
-        os.path.join(results_dir, "all_mlst.out")
+        os.path.join(results_dir, "all/all_mlst.out")
     params:
         mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:

@@ -358,6 +358,7 @@ rule multiqc_all:
     conda:
         "envs/wgs.yml"
     params:
+        input_dir = lambda wildcards: os.path.join(results_dir, wildcards.sample),
         multiqc_res_dir = lambda wildcards, output: os.path.split(output[0])[0],
         log_dir = os.path.join(results_dir, "logs")
         # assembly_dir    = os.path.join(results_dir, 
@@ -366,11 +367,8 @@ rule multiqc_all:
     shell:
         """
         multiqc -f \
-        -x {assembly_spades_outpath} \
-        -x {raw_outpath} \
         -o {params.multiqc_res_dir} \
-        {qc} \
-        {params.log_dir} &> {log}
+        {params.input_dir} &> {log}
         """
 
 rule mlst:

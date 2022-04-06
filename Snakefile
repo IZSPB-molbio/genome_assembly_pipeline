@@ -351,8 +351,8 @@ rule abricate_summary:
 rule multiqc_all:
     """MultiQC report for single file"""
     input:
-        quast_out = rule.assembly_qc.output.pdf,
-        prokka_out = rule.annotation.output.sqn.
+        quast_out = rules.assembly_qc.output.pdf,
+        prokka_out = rules.annotation.output.sqn
         # expand(os.path.join(results_dir, "{sample}/annotation/prokka/{sample}/{sample}.sqn"), sample=sample_list),
     output:
         report = os.path.join(results_dir, "{sample}/reports/multiqc_report.html")

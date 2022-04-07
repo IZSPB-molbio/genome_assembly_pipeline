@@ -57,10 +57,10 @@ if [ ! $database_dir = 0 ]; then
 	for file in $database_dir/*.f?(ast)q*; do
 		sample=$(basename $file | cut -d_ -f 1)
 		if [[ ! " ${samples_dir[@]} " =~ " ${sample} " ]] && [[ ! " ${samples_fail[@]} " =~ " ${sample} " ]]; then
-			count=$(($(ls $database_dir/${sample}*_L00*_R{1,2}*.f?(ast)q* 2>/dev/null | wc -l)/2)) || samples_fail+=("${sample}") # estimate # of files; sample fails if file(s) missing
+			count=$(($(ls $database_dir/${sample}_*_L00*_R{1,2}*.f?(ast)q* 2>/dev/null | wc -l)/2)) || samples_fail+=("${sample}") # estimate # of files; sample fails if file(s) missing
 			for (( i=1; i<=$count; i++ )); do
-				r1=$(ls $database_dir/${sample}*_L00${i}_R1* | grep /${sample}_) 
-				r2=$(ls $database_dir/${sample}*_L00${i}_R2* | grep /${sample}_)
+				r1=$(ls $database_dir/${sample}_*_L00${i}_R1* | grep /${sample}_) 
+				r2=$(ls $database_dir/${sample}_*_L00${i}_R2* | grep /${sample}_)
 				echo -e "${sample}\t1\t${r1}\t${r2}" >> ${name} && echo -e "${sample}\t1\t${r1}\t${r2}"
 			done
 			samples_dir+=("${sample}") # sample passed

@@ -30,6 +30,7 @@ with open(log, "w") as f:
         mlst \
         --label {sample} \
         --nopath \
+        --novel {outdir}/{sample}_new_alleles.fa \
         {assembly_file} >> {outdir}/{sample}_mlst.out
         """)
         # prokka \

@@ -397,3 +397,14 @@ def fastqc_outputs(datasets_tab: pd.DataFrame,
                     )
                 )
     return fastqc_out
+
+def get_kaiju_kronaplots(datasets_tab=None, results_dir=None):
+    # (results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out.html")
+    outpaths = []
+    for row in datasets_tab.itertuples():
+        outpaths.append(os.path.join(results_dir,
+                                     "{sample}/qc/kaiju/{sample}_{library}_kaiju.out.html".format(
+                                        sample=getattr(row, "sample"),
+                                        library=getattr(row, "library")
+                                     )))
+    return outpaths

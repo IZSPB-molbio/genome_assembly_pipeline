@@ -16,7 +16,7 @@ import pandas as pd
 from modules.config_parsers import (
     fastqc_outputs, get_bed_files, get_datasets_for_symlinks,
     get_fasta_files, get_genome_files, get_genome_single_vcf_files,
-    get_genome_single_vcf_index_files, get_genome_vcf_files, get_mt_genomes, get_mt_fasta,
+    get_genome_single_vcf_index_files, get_genome_vcf_files, get_kaiju_kronaplots, get_mt_genomes, get_mt_fasta,
     get_sample_bamfiles, get_symlinks, parse_config_tabs
 )
 
@@ -53,6 +53,7 @@ rule all:
         # os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "all/all_mlst.out"),
         # kronaplot (read taxonomic classification)
+        get_kaiju_kronaplots(datasets_tab=datasets_tab, results_dir=results_dir),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),

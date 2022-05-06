@@ -10,3 +10,4 @@
 - AMR and VF prediction: ABRicate - https://github.com/tseemann/abricate
 - MLST typing: MLST - https://github.com/tseemann/mlst
 - Determine closely related reference genomes: ReferenceSeeker - https://github.com/oschwengers/referenceseeker
+- Kaiju

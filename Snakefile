@@ -53,7 +53,7 @@ rule all:
         # os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "all/all_mlst.out"),
         # kronaplot (read taxonomic classification)
-        expand(os.path.join(results_dir, "{sample}/reports/{sample}_read_tax_classification.html"), sample=sample_list),
+        expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),
@@ -136,7 +136,7 @@ rule kaiju:
     output:
         kaiju_out = os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out")
     params:
-        kaiju_db  = config['read_processing']['kaiju']['db']
+        kaiju_db  = config['read_processing']['kaiju']['db'],
         nodes_dmp = config['read_processing']['kaiju']['nodes_dmp']
     threads:
         config['read_processing']['kaiju']['threads']
@@ -153,8 +153,8 @@ rule kaiju2krona:
     output:
         kaiju_out_krona = os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out.html")
     params:
-        nodes_dmp   = config['read_processing']['kaiju']['nodes_dmp']
-        names_dmp   = config['read_processing']['kaiju']['names_dmp']
+        nodes_dmp   = config['read_processing']['kaiju']['nodes_dmp'],
+        names_dmp   = config['read_processing']['kaiju']['names_dmp'],
         krona_input = lambda wildcards, output: output.kaiju_out_krona.replace(".html", ".krona")
     conda:
         "envs/kaiju.yml"

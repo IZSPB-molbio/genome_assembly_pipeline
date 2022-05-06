@@ -1,0 +1,9 @@
+name: kaiju
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - kaiju=1.8.2
+  - krona=2.8.1

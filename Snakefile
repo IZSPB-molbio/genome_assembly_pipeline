@@ -135,7 +135,7 @@ rule kaiju:
         R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
         R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
     output:
-        kaiju_out = os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out")
+        kaiju_out = temp(os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out"))
     params:
         kaiju_db  = config['read_processing']['kaiju']['db'],
         nodes_dmp = config['read_processing']['kaiju']['nodes_dmp']

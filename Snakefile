@@ -54,7 +54,7 @@ rule all:
         os.path.join(results_dir, "all/all_mlst.out"),
         # kronaplot (read taxonomic classification)
         get_kaiju_kronaplots(datasets_tab=datasets_tab, results_dir=results_dir),
-        expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
+        # expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),

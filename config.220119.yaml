@@ -1,0 +1,34 @@
+results_dir:    "220119"
+analysis_tab_file: "data/analysis.220119.tab"
+datasets_tab_file: "data/datasets.220119.tab"
+reads_raw_source: "~/data/220119"
+
+map_dir:    "map"
+log_dir:    "logs"
+tmp_dir:    "/tmp"
+species: 
+reads_raw: "data/reads/raw"
+
+qc:
+    qc: "qc"
+    fastqc:
+        raw: "qc/data/reads/raw"
+        filtered: "qc/data/reads/filtered"
+
+read_processing:
+    kaiju:
+        db: "~/data/kaiju/kaiju_db_refseq.fmi"
+        nodes_dmp: "~/data/kaiju/nodes.dmp"
+        names_dmp: "~/data/kaiju/names.dmp"
+    trimmomatic:
+        outdir: "data/reads/filtered"
+        options: "-phred33"
+        processing_options: "LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36"
+        java_cmd: "java"
+        java_vm_mem: "4G"
+        threads: 5
+        adapters: "all_adapters.fasta"
+
+assembly:
+    spades:
+        outdir: "assembly/spades"

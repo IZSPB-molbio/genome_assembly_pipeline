@@ -52,6 +52,8 @@ rule all:
         # os.path.join(results_dir, "reports/multiqc_report.html"),
         # os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "all/all_mlst.out"),
+        # kronaplot (read taxonomic classification)
+        expand(os.path.join(results_dir, "{sample}/reports/{sample}_read_tax_classification.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),
@@ -125,6 +127,46 @@ rule fastqc_raw:
         mkdir -p {params.outDir}
         fastqc -t {threads} -o {params.outDir} {input} &> {log}
         """
+
+rule kaiju:
+    """Taxonomic classification of raw reads for QC purposes. Only allowed option is db folder"""
+    input:
+        R1 = os.path.join(raw_outpath, "{sample}_{library}.R1.fastq.gz"),
+        R2 = os.path.join(raw_outpath, "{sample}_{library}.R2.fastq.gz"),
+    output:
+        kaiju_out = os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out")
+    params:
+        kaiju_db  = config['read_processing']['kaiju']['db']
+        nodes_dmp = config['read_processing']['kaiju']['nodes_dmp']
+    threads:
+        config['read_processing']['kaiju']['threads']
+    log:
+        os.path.join(results_dir, "{sample}/logs/qc/{sample}_{library}_kaiju.log")
+    conda:
+        "envs/kaiju.yml"
+    script:
+        "scripts/kaiju.py"
+
+rule kaiju2krona:
+    input:
+        rules.kaiju.output.kaiju_out
+    output:
+        kaiju_out_krona = os.path.join(results_dir, "{sample}/qc/kaiju/{sample}_{library}_kaiju.out.html")
+    params:
+        nodes_dmp   = config['read_processing']['kaiju']['nodes_dmp']
+        names_dmp   = config['read_processing']['kaiju']['names_dmp']
+        krona_input = lambda wildcards, output: output.kaiju_out_krona.replace(".html", ".krona")
+    conda:
+        "envs/kaiju.yml"
+    shell:
+        "kaiju2krona \
+        -t {params.nodes_dmp} \
+        -n {params.names_dmp} \
+        -i {input} \
+        -o {params.krona_input} && \
+        ktImportText \
+        -o {output.kaiju_out_krona} \
+        {params.krona_input}"
 
 rule trimmomatic:
     """ QCing and cleaning reads """

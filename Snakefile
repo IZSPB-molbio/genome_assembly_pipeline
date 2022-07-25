@@ -55,6 +55,7 @@ rule all:
         # kronaplot (read taxonomic classification)
         get_kaiju_kronaplots(datasets_tab=datasets_tab, results_dir=results_dir),
         # expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
+        # expand(os.path.join(results_dir, "{sample}/qc/qualimap/qualimap_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/multiqc_report.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html"), sample=sample_list),
         expand(os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab"), sample=sample_list),
@@ -347,6 +348,34 @@ rule annotation:
         os.path.join(results_dir, "{sample}/logs/annotation/prokka/{sample}.log")
     script:
         "scripts/prokka.py"
+
+# rule post_assembly_alignment:
+#     """Create input for qualimap"""
+#     input:
+#         R1 = 
+#         R2 = 
+#         assembly =
+#     output:
+#         sam = 
+#     threads: 5
+#     conda: "envs/wgs.yml"
+#     log: 
+#     script:
+#         "scripts/post_assembly_alignment.py"
+# 
+# #os.path.join(results_dir, "{sample}/qc/qualimap/qualimap_report.html")
+# rule qualimap:
+#     input:
+#         alignment      = rules.post_assembly_alignment2bam.output.bam,
+#         annotation_sqn = rules.annotation.output.sqn,
+#     output:
+#         qualimap_report = os.path.join(results_dir, "{sample}/qc/qualimap/qualimap_report.html")
+#     conda:
+#         "envs/qualimap.yml"
+#     log:
+#         os.path.join(results_dir, "{sample}/logs/qc/qualimap/qualimap.log")
+#     script:
+#         "scripts/qualimap.py"
 
 rule referenceseeker:
     input:

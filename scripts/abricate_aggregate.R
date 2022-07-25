@@ -19,7 +19,7 @@ log <- file(snakemake@log[[1]], open="wt")
 sink(log)
 
 # craft the table
-abricate.results.files <- list.files(path = abricate_res_dir, pattern = "*_*.out", full.names = TRUE)
+abricate.results.files <- list.files(path = abricate_res_dir, pattern = paste0(snakemake@wildcards[['sample']], "*_*.out"), full.names = TRUE)
 #print(abricate.results.files)
 abricate.results <- data.frame(do.call("rbind", lapply(abricate.results.files, read.abricate))) %>% mutate(resistance=tolower(resistance))
 

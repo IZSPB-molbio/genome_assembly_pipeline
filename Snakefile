@@ -408,7 +408,7 @@ rule abricate:
 rule abricate_summary:
     """Collate abricate results for single sample"""
     input:
-        expand(os.path.join(results_dir, "{sample}/annotation/abricate/{sample}.done"), sample=sample_list)
+        os.path.join(results_dir, "{sample}/annotation/abricate/{sample}.done")
     output:
         os.path.join(results_dir, "{sample}/reports/{sample}_abricate.html")
     params:

@@ -53,6 +53,8 @@ rule all:
         # os.path.join(results_dir, "reports/multiqc_report.html"),
         # os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "all/all_mlst.out"),
+        # checkm output
+        os.path.join(results_dir, "all", "all_checkm.out"),
         # copy of all scaffolds file, for easy retrieving
         # and checkm processing
         expand(os.path.join(results_dir, "all", "{sample}_scaffolds.fasta"), sample=sample_list),
@@ -317,6 +319,32 @@ rule create_checkm_inputs:
     shell:
         """
         cp {input.assembly} {output.assembly}
+        """
+
+rule checkm:
+    input:
+        assemblies = expand(os.path.join(results_dir, "all", "{sample}_scaffolds.fasta"), sample=sample_list)
+    output:
+        checkm_output = os.path.join(results_dir, "all", "all_checkm.out")
+    params:
+        indir  = os.path.join(results_dir, "all")
+        outdir = os.path.join(results_dir, "all", "checkm")
+        ext    = "fasta"
+    conda:
+        "envs/checkm.yml"
+    threads:
+        20
+    log:
+        os.path.join(results_dir, "logs/qc/checkm/checkm.log")
+    shell:
+        """
+        export CHECKM_DATA_PATH=/path/to/my_checkm_data
+        checkm lineage_wf \
+            --tab_table -t {threads} --pplacer_threads {threads} \
+            -f {output.checkm_output} \
+            -x {params.ext} \
+            {params.outdir} \
+            {params.indir}
         """
 
 rule assembly_qc:

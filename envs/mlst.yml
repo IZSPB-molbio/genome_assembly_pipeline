@@ -5,4 +5,4 @@ channels:
   - defaults
   - r
 dependencies:
-  - mlst
+  - mlst=2.22.0

@@ -327,7 +327,7 @@ rule checkm:
     output:
         checkm_output = os.path.join(results_dir, "all", "all_checkm.out")
     params:
-        indir  = os.path.join(results_dir, "all")
+        indir  = os.path.join(results_dir, "all"),
         outdir = os.path.join(results_dir, "all", "checkm")
         ext    = "fasta"
     conda:

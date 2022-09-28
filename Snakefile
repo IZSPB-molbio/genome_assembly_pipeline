@@ -329,9 +329,10 @@ rule checkm:
     output:
         checkm_output = os.path.join(results_dir, "all", "all_checkm.out")
     params:
-        indir  = os.path.join(results_dir, "all"),
-        outdir = os.path.join(results_dir, "all", "checkm"),
-        ext    = "fasta"
+        indir           = os.path.join(results_dir, "all"),
+        outdir          = os.path.join(results_dir, "all", "checkm"),
+        checkm_data_dir = checkm_data,
+        ext             = "fasta"
     conda:
         "envs/checkm.yml"
     threads:
@@ -340,13 +341,13 @@ rule checkm:
         os.path.join(results_dir, "logs/qc/checkm/checkm.log")
     shell:
         """
-        export CHECKM_DATA_PATH={{checkm_data}}
+        export CHECKM_DATA_PATH={params.checkm_data_dir}
         checkm lineage_wf \
             --tab_table -t {threads} --pplacer_threads {threads} \
             -f {output.checkm_output} \
             -x {params.ext} \
-            {params.outdir} \
-            {params.indir}
+            {params.indir} \
+            {params.outdir}
         """
 
 rule assembly_qc:

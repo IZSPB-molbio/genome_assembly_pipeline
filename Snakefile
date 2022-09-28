@@ -32,6 +32,8 @@ configfile: "config.yaml"
 analysis_tab_file = config["analysis_tab_file"]
 datasets_tab_file = config["datasets_tab_file"]
 
+checkm_data = config["checkm"]["data_dir"]
+
 results_dir = config["results_dir"]
 qc                 = os.path.join(results_dir, config["qc"]["qc"])
 qc_fastqc_raw      = os.path.join(config["qc"]["fastqc"]["raw"])
@@ -338,7 +340,7 @@ rule checkm:
         os.path.join(results_dir, "logs/qc/checkm/checkm.log")
     shell:
         """
-        export CHECKM_DATA_PATH=/path/to/my_checkm_data
+        export CHECKM_DATA_PATH={{checkm_data}}
         checkm lineage_wf \
             --tab_table -t {threads} --pplacer_threads {threads} \
             -f {output.checkm_output} \

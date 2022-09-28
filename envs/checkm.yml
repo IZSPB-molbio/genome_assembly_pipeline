@@ -6,3 +6,4 @@ channels:
   - r
 dependencies:
   - checkm-genome
+  - python=3.9

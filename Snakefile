@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import time
+import tempfile
 
 # from Bio import SeqIO
 # import numpy as np
@@ -52,6 +53,9 @@ rule all:
         # os.path.join(results_dir, "reports/multiqc_report.html"),
         # os.path.join(results_dir, "reports/abricate.html"),
         os.path.join(results_dir, "all/all_mlst.out"),
+        # copy of all scaffolds file, for easy retrieving
+        # and checkm processing
+        expand(os.path.join(results_dir, "all", "{sample}_scaffolds.fasta"), sample=sample_list),
         # kronaplot (read taxonomic classification)
         get_kaiju_kronaplots(datasets_tab=datasets_tab, results_dir=results_dir),
         # expand(os.path.join(results_dir, "{sample}/reports/{sample}_kaiju.out.html"), sample=sample_list),
@@ -304,6 +308,16 @@ rule assembly:
         os.path.join(results_dir, "{sample}/logs/assembly/spades/{sample}.log")
     script:
         "scripts/spades.py"
+
+rule create_checkm_inputs:
+    input:
+        assembly = rules.assembly.output.final_file,
+    output:
+        assembly = os.path.join(results_dir, "all", "{sample}_scaffolds.fasta")
+    shell:
+        """
+        cp {input.assembly} {output.assembly}
+        """
 
 rule assembly_qc:
     input:

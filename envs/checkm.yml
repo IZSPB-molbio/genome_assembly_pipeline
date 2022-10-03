@@ -5,5 +5,14 @@ channels:
   - defaults
   - r
 dependencies:
-  - checkm-genome
   - python=3.9
+  - pyparsing=3.0.9=py39h06a4308_0
+  - numpy
+  - matplotlib
+  - pysam
+  - hmmer
+  - prodigal
+  - pplacer
+  - pip
+  - pip:
+    - checkm-genome

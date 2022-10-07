@@ -5,6 +5,6 @@ channels:
   - defaults
   - r
 dependencies:
-  - pandas
-  - snakemake
+  - snakemake=5.3.0
   - biopython
+  - python=3.6

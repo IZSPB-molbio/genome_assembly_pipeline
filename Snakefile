@@ -33,6 +33,7 @@ analysis_tab_file = config["analysis_tab_file"]
 datasets_tab_file = config["datasets_tab_file"]
 
 checkm_data = config["checkm"]["data_dir"]
+referenceseeker_data = config["referenceseeker"]["data_dir"]
 
 results_dir = config["results_dir"]
 qc                 = os.path.join(results_dir, config["qc"]["qc"])
@@ -429,6 +430,8 @@ rule referenceseeker:
         res = os.path.join(results_dir, "{sample}/qc/referenceseeker/{sample}.tab")
     conda:
         "envs/referenceseeker.yml"
+    params:
+        referenceseeker_data_dir = referenceseeker_data,
     threads:
         10
     log:

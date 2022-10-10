@@ -11,6 +11,7 @@ assembly_file = snakemake.input.assembly#.replace("pipeline_state/stage_9_termin
 outfile       = snakemake.output.res
 #outdir        = snakemake.params.outdir
 threads       = snakemake.threads
+data          = snakemake.params.referenceseeker_data_dir
 log           = snakemake.log[0]
 
 with open(log, "w") as f:
@@ -19,6 +20,6 @@ with open(log, "w") as f:
     shell("""
         referenceseeker \
         --threads {threads} \
-        data/referenceseeker/bacteria-refseq \
+        {data} \
         {assembly_file} > {outfile}
         """)

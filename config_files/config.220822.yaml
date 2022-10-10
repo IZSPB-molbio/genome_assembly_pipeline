@@ -37,3 +37,5 @@ assembly:
 checkm:
     data_dir: "/g100_work/ELIX5_simone/data/checkm"
 
+referenceseeker:
+    data_dir: "/g100_work/ELIX5_simone/data/referenceseeker/bacteria-refseq"

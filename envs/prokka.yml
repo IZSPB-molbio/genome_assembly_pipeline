@@ -5,5 +5,5 @@ channels:
   - defaults
   - r
 dependencies:
-  - prokka
-  - blast=2.2
+  - prokka=1.14
+  - blast

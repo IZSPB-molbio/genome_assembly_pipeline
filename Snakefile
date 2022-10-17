@@ -544,7 +544,7 @@ rule rmlst_api:
 
 rule rmlst_collate:
     input:
-        expand(os.path.join(results_dir, "{sample}/sequence_typing/rmlst/{sample}_mlst.out"), sample=sample_list)
+        expand(os.path.join(results_dir, "{sample}/sequence_typing/rmlst/{sample}_rmlst.tab"), sample=sample_list)
     output:
         os.path.join(results_dir, "all/all_rmlst.out")
     params:

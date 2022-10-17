@@ -125,6 +125,7 @@ rule fastqc_raw:
         html_report_R2 =  os.path.join(results_dir, "{sample}", qc_fastqc_raw, "{sample}_{library}.R2_fastqc.html"), 
     params:
         outDir = os.path.join(results_dir, "{sample}", qc_fastqc_raw)
+    group: "cluster_group"
     threads:
         2
     # version:
@@ -152,6 +153,7 @@ rule kaiju:
         nodes_dmp = config['read_processing']['kaiju']['nodes_dmp']
     threads:
         config['read_processing']['kaiju']['threads']
+    group: "cluster_group"
     log:
         os.path.join(results_dir, "{sample}/logs/qc/{sample}_{library}_kaiju.log")
     conda:
@@ -168,6 +170,7 @@ rule kaiju2krona:
         nodes_dmp   = config['read_processing']['kaiju']['nodes_dmp'],
         names_dmp   = config['read_processing']['kaiju']['names_dmp'],
         krona_input = lambda wildcards, output: output.kaiju_out_krona.replace(".html", ".krona")
+    group: "cluster_group"
     conda:
         "envs/kaiju.yml"
     shell:
@@ -211,6 +214,7 @@ rule trimmomatic:
     log:
         os.path.join(results_dir, "{sample}/logs/data/reads/filtered/{sample}_{library}_trimmomatic.log")
     conda: "envs/wgs.yml"
+    group: "cluster_group"
     shell:
         """
         # export tap=$(which trimmomatic | sed "s/bin\/trimmomatic/share\/trimmomatic\/adapters\/{params.adapters}/g")
@@ -248,6 +252,7 @@ rule fastqc_filtered:
     log:
         os.path.join(results_dir, "{sample}/logs/qc/data/reads/filtered/{sample}_{library}.log")
     conda: "envs/wgs.yml"
+    group: "cluster_group"
     shell:
         """
 
@@ -269,6 +274,7 @@ rule merge_PE:
     log:
         os.path.join(results_dir, "{sample}/logs/data/reads/filtered/flash/{sample}_{library}.log")
     conda: "envs/wgs.yml"
+    group: "cluster_group"
     shell:
         """
         flash \
@@ -312,6 +318,7 @@ rule assembly:
         10
     log:
         os.path.join(results_dir, "{sample}/logs/assembly/spades/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/spades.py"
 
@@ -320,6 +327,7 @@ rule create_checkm_inputs:
         assembly = rules.assembly.output.final_file,
     output:
         assembly = os.path.join(results_dir, "all", "{sample}_scaffolds.fasta")
+    group: "cluster_group"
     shell:
         """
         cp {input.assembly} {output.assembly}
@@ -341,6 +349,7 @@ rule checkm:
         20
     log:
         os.path.join(results_dir, "logs/qc/checkm/checkm.log")
+    group: "cluster_group"
     shell:
         """
         export CHECKM_DATA_PATH={params.checkm_data_dir}
@@ -377,6 +386,7 @@ rule assembly_qc:
         10
     log:
         os.path.join(results_dir, "{sample}/logs/qc/quast/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/quast.py"
 
@@ -393,6 +403,7 @@ rule annotation:
         10
     log:
         os.path.join(results_dir, "{sample}/logs/annotation/prokka/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/prokka.py"
 
@@ -437,6 +448,7 @@ rule referenceseeker:
         10
     log:
         os.path.join(results_dir, "{sample}/logs/qc/referenceseeker/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/referenceseeker.py"
 
@@ -451,6 +463,7 @@ rule abricate:
         4
     log:
         os.path.join(results_dir, "{sample}/logs/annotation/abricate/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/abricate.py"
 
@@ -464,6 +477,7 @@ rule abricate_summary:
         abricate_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:
         os.path.join(results_dir, "{sample}/logs/annotation/abricate/aggregate.log")
+    group: "cluster_group"
     conda:
         "envs/r-stuff.yml"
     script:
@@ -486,6 +500,7 @@ rule multiqc_all:
         # assembly_dir    = os.path.join(results_dir, 
     log:
         os.path.join(results_dir, "{sample}/logs/qc/multiqc.log")
+    group: "cluster_group"
     shell:
         """
         multiqc -f \
@@ -506,6 +521,7 @@ rule mlst:
         1
     log:
         os.path.join(results_dir, "{sample}/logs/sequence_typing/mlst/{sample}.log")
+    group: "cluster_group"
     script:
         "scripts/mlst.py"
 
@@ -518,6 +534,7 @@ rule mlst_collate:
         mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:
         os.path.join(results_dir, "logs/sequence_typing/mlst/aggregate.log")
+    group: "cluster_group"
     # conda:
     #     "envs/r-stuff.yml"
     shell:
@@ -539,6 +556,7 @@ rule rmlst_api:
         1
     log:
         "logs/sequence_typing/rmlst/{sample}.log"
+    #group: "cluster_group"
     script:
         "scripts/rmlst.py"
 
@@ -551,6 +569,7 @@ rule rmlst_collate:
         mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
     log:
         os.path.join(results_dir, "logs/sequence_typing/rmlst/aggregate.log")
+    #group: "cluster_group"
     # conda:
     #     "envs/r-stuff.yml"
     shell:

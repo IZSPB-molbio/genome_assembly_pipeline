@@ -496,7 +496,7 @@ rule mlst:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        mlst = os.path.join(results_dir, "{sample}/sequence_typing/{sample}_mlst.out")
+        mlst = os.path.join(results_dir, "{sample}/sequence_typing/mlst/{sample}_mlst.out")
     params:
         outdir = lambda wildcards, output: os.path.split(output.mlst)[0]
     conda:
@@ -510,7 +510,7 @@ rule mlst:
 
 rule mlst_collate:
     input:
-        expand(os.path.join(results_dir, "{sample}/sequence_typing/{sample}_mlst.out"), sample=sample_list)
+        expand(os.path.join(results_dir, "{sample}/sequence_typing/mlst/{sample}_mlst.out"), sample=sample_list)
     output:
         os.path.join(results_dir, "all/all_mlst.out")
     params:
@@ -523,3 +523,20 @@ rule mlst_collate:
         """
         cat {input} > {output}
         """
+
+rule rmlst_api:
+    input:
+        assembly = rules.assembly.output.final_file,
+    output:
+        rmlst_json     = os.path.join(results_dir, "results/{sample}/sequence_typing/{sample}_rmlst.json"),
+        rmlst_tab      = os.path.join(results_dir, "results/{sample}/sequence_typing/{sample}_rmlst.tab")
+    params:
+        outdir = lambda wildcards, output: os.path.split(output.rmlst_json)[0]
+    # conda:
+    #     "envs/mlst.yml"
+    threads:
+        1
+    log:
+        "logs/sequence_typing/rmlst/{sample}.log"
+    script:
+        "scripts/rmlst.py"

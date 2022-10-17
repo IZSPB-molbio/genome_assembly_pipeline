@@ -55,6 +55,7 @@ rule all:
     input:
         # os.path.join(results_dir, "reports/multiqc_report.html"),
         # os.path.join(results_dir, "reports/abricate.html"),
+        os.path.join(results_dir, "all/all_rmlst.out"),
         os.path.join(results_dir, "all/all_mlst.out"),
         # checkm output
         os.path.join(results_dir, "all", "all_checkm.out"),
@@ -528,8 +529,8 @@ rule rmlst_api:
     input:
         assembly = rules.assembly.output.final_file,
     output:
-        rmlst_json     = os.path.join(results_dir, "results/{sample}/sequence_typing/{sample}_rmlst.json"),
-        rmlst_tab      = os.path.join(results_dir, "results/{sample}/sequence_typing/{sample}_rmlst.tab")
+        rmlst_json     = os.path.join(results_dir, "{sample}/sequence_typing/rmlst/{sample}_rmlst.json"),
+        rmlst_tab      = os.path.join(results_dir, "{sample}/sequence_typing/rmlst/{sample}_rmlst.tab")
     params:
         outdir = lambda wildcards, output: os.path.split(output.rmlst_json)[0]
     # conda:
@@ -540,3 +541,19 @@ rule rmlst_api:
         "logs/sequence_typing/rmlst/{sample}.log"
     script:
         "scripts/rmlst.py"
+
+rule rmlst_collate:
+    input:
+        expand(os.path.join(results_dir, "{sample}/sequence_typing/rmlst/{sample}_mlst.out"), sample=sample_list)
+    output:
+        os.path.join(results_dir, "all/all_rmlst.out")
+    params:
+        mlst_res_dir = lambda wildcards, input: os.path.split(input[0])[0]
+    log:
+        os.path.join(results_dir, "logs/sequence_typing/rmlst/aggregate.log")
+    # conda:
+    #     "envs/r-stuff.yml"
+    shell:
+        """
+        cat {input} > {output}
+        """

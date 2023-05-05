@@ -13,3 +13,4 @@
 - Kaiju
 - CheckM
 - rMLST
+- others
